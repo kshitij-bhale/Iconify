@@ -95,6 +95,13 @@ This project exists thanks to the following contributors:
 		</tr>
 		<tr>
             <td align="center">
+                <a href="https://github.com/kshitij-bhale">
+                    <img src="https://avatars.githubusercontent.com/u/156404280?v=4" width="100;" alt="kshitij-bhale"/>
+                    <br />
+                    <sub><b>kshitij-bhale</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/hndrk-themer">
                     <img src="https://avatars.githubusercontent.com/u/84930289?v=4" width="100;" alt="hndrk-themer"/>
                     <br />
@@ -106,13 +113,6 @@ This project exists thanks to the following contributors:
                     <img src="https://avatars.githubusercontent.com/u/92359223?v=4" width="100;" alt="H1mJT"/>
                     <br />
                     <sub><b>Himjyoti Thakuria</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/kshitij-bhale">
-                    <img src="https://avatars.githubusercontent.com/u/156404280?v=4" width="100;" alt="kshitij-bhale"/>
-                    <br />
-                    <sub><b>kshitij-bhale</b></sub>
                 </a>
             </td>
             <td align="center">
