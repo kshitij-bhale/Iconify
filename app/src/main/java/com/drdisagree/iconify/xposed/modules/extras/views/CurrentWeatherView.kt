@@ -16,13 +16,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.drdisagree.iconify.BuildConfig
 import com.drdisagree.iconify.R
-import com.drdisagree.iconify.ui.utils.ViewHelper.applyTextSizeRecursively
-import com.drdisagree.iconify.ui.utils.ViewHelper.setTextRecursively
-import com.drdisagree.iconify.utils.OmniJawsClient
+import com.drdisagree.iconify.core.utils.OmniJawsClient
+import com.drdisagree.iconify.core.utils.ViewHelper.applyTextSizeRecursively
+import com.drdisagree.iconify.core.utils.ViewHelper.setTextRecursively
 import com.drdisagree.iconify.xposed.HookRes.Companion.modRes
 import com.drdisagree.iconify.xposed.modules.extras.callbacks.ThemeChangeCallback
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.findViewContainsTag
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.findViewWithTagAndChangeColor
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.findViewContainingTag
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.findViewWithTagAndChangeColor
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.log
 import java.util.Locale
 import java.util.function.Consumer
@@ -92,16 +92,16 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
     }
 
     private fun setupViews() {
-        mLeftText = findViewContainsTag("leftText") as TextView
-        mCurrentImage = findViewContainsTag("currentImage") as ImageView
-        mRightText = findViewContainsTag("rightText") as TextView
-        mWeatherText = findViewContainsTag("weatherText") as TextView
-        mHumLayout = findViewContainsTag("humLayout") as LinearLayout
-        mHumImage = findViewContainsTag("humImage") as ImageView
-        mHumText = findViewContainsTag("humText") as TextView
-        mWindLayout = findViewContainsTag("windLayout") as LinearLayout
-        mWindImage = findViewContainsTag("windImage") as ImageView
-        mWindText = findViewContainsTag("windText") as TextView
+        mLeftText = findViewContainingTag("leftText") as TextView
+        mCurrentImage = findViewContainingTag("currentImage") as ImageView
+        mRightText = findViewContainingTag("rightText") as TextView
+        mWeatherText = findViewContainingTag("weatherText") as TextView
+        mHumLayout = findViewContainingTag("humLayout") as LinearLayout
+        mHumImage = findViewContainingTag("humImage") as ImageView
+        mHumText = findViewContainingTag("humText") as TextView
+        mWindLayout = findViewContainingTag("windLayout") as LinearLayout
+        mWindImage = findViewContainingTag("windImage") as ImageView
+        mWindText = findViewContainingTag("windText") as TextView
 
         mWindDrawable = ContextCompat.getDrawable(
             appContext!!,
@@ -127,7 +127,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             }
             .orElse("")
 
-        return if (instance.isEmpty()) throw IllegalStateException("No instance name found") else instance
+        return instance.ifEmpty { throw IllegalStateException("No instance name found") }
     }
 
     fun updateSizes(weatherTextSize: Int, weatherImageSize: Int, name: String) {
@@ -195,7 +195,17 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
 
     override fun weatherError(errorReason: Int) {
         // Show only Disabled and Permission errors
-        log(this@CurrentWeatherView, "weatherError: $errorReason")
+        log(
+            this@CurrentWeatherView, "Weather Error: ${
+                when (errorReason) {
+                    OmniJawsClient.EXTRA_ERROR_NETWORK -> "No network"
+                    OmniJawsClient.EXTRA_ERROR_LOCATION -> "No location found"
+                    OmniJawsClient.EXTRA_ERROR_DISABLED -> "Location disabled"
+                    OmniJawsClient.EXTRA_ERROR_NO_PERMISSIONS -> "No permission"
+                    else -> errorReason
+                }
+            }"
+        )
         if (errorReason == OmniJawsClient.EXTRA_ERROR_DISABLED) {
             mWeatherInfo = null
         }
@@ -324,7 +334,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             1 -> {
                 bg = ResourcesCompat.getDrawable(
                     appContext!!.resources,
-                    R.drawable.date_box_str_border,
+                    R.drawable.lockscreen_weather_bg_date_box_str_border,
                     appContext!!.theme
                 )
                 mWeatherHorPadding = TypedValue.applyDimension(
@@ -342,7 +352,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             2 -> {
                 bg = ResourcesCompat.getDrawable(
                     appContext!!.resources,
-                    R.drawable.date_str_border,
+                    R.drawable.lockscreen_weather_bg_date_str_border,
                     appContext!!.theme
                 )
                 mWeatherHorPadding = TypedValue.applyDimension(
@@ -360,7 +370,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             3 -> {
                 bg = ResourcesCompat.getDrawable(
                     appContext!!.resources,
-                    R.drawable.ambient_indication_pill_background,
+                    R.drawable.lockscreen_weather_bg_ambient_indication_pill_background,
                     appContext!!.theme
                 )
                 mWeatherHorPadding = TypedValue.applyDimension(
@@ -378,7 +388,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             4, 5 -> {
                 bg = ResourcesCompat.getDrawable(
                     appContext!!.resources,
-                    R.drawable.date_str_accent,
+                    R.drawable.lockscreen_weather_bg_date_str_accent,
                     appContext!!.theme
                 )
                 mWeatherHorPadding = TypedValue.applyDimension(
@@ -398,7 +408,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             6 -> {
                 bg = ResourcesCompat.getDrawable(
                     appContext!!.resources,
-                    R.drawable.date_str_gradient,
+                    R.drawable.lockscreen_weather_bg_date_str_gradient,
                     appContext!!.theme
                 )
                 mWeatherHorPadding = TypedValue.applyDimension(
@@ -418,7 +428,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             7 -> {
                 bg = ResourcesCompat.getDrawable(
                     appContext!!.resources,
-                    R.drawable.date_str_borderacc,
+                    R.drawable.lockscreen_weather_bg_date_str_borderacc,
                     appContext!!.theme
                 )
                 mWeatherHorPadding = TypedValue.applyDimension(
@@ -438,7 +448,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
             8 -> {
                 bg = ResourcesCompat.getDrawable(
                     appContext!!.resources,
-                    R.drawable.date_str_bordergrad,
+                    R.drawable.lockscreen_weather_bg_date_str_bordergrad,
                     appContext!!.theme
                 )
                 mWeatherHorPadding = TypedValue.applyDimension(
@@ -496,7 +506,7 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
     companion object {
         private val TAG: String = CurrentWeatherView::class.java.name
 
-        val Int.dp: Int
+        private val Int.toDp: Int
             get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
 
         @Volatile
@@ -511,8 +521,8 @@ class CurrentWeatherView(context: Context, name: String) : LinearLayout(context)
                 .forEach { obj: Array<Any> ->
                     val instance = obj[0] as CurrentWeatherView
                     val params = instance.mCurrentImage!!.layoutParams as LayoutParams
-                    params.width = size.dp
-                    params.height = size.dp
+                    params.width = size.toDp
+                    params.height = size.toDp
                     params.gravity = Gravity.CENTER_VERTICAL
                     instance.mCurrentImage!!.layoutParams = params
                     instance.mHumImage!!.layoutParams = params

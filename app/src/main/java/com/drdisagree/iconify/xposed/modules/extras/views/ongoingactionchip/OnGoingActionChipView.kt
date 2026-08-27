@@ -12,8 +12,8 @@ import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import com.drdisagree.iconify.R
 import com.drdisagree.iconify.xposed.HookRes.Companion.modRes
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.toPx
-import com.drdisagree.iconify.xposed.modules.extras.utils.getColorResCompat
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.toPx
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.getColorResCompat
 
 @SuppressLint("DiscouragedApi", "UseCompatLoadingForDrawables")
 class OnGoingActionChipView @JvmOverloads constructor(

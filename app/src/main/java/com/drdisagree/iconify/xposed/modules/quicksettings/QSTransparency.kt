@@ -4,13 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.widget.LinearLayout
+import androidx.core.graphics.ColorUtils
 import com.drdisagree.iconify.data.common.Const.SYSTEMUI_PACKAGE
-import com.drdisagree.iconify.data.common.Preferences.BLUR_RADIUS_VALUE
-import com.drdisagree.iconify.data.common.Preferences.LOCKSCREEN_SHADE_SWITCH
-import com.drdisagree.iconify.data.common.Preferences.NOTIF_TRANSPARENCY_SWITCH
-import com.drdisagree.iconify.data.common.Preferences.QSALPHA_LEVEL
-import com.drdisagree.iconify.data.common.Preferences.QSPANEL_BLUR_SWITCH
-import com.drdisagree.iconify.data.common.Preferences.QS_TRANSPARENCY_SWITCH
+import com.drdisagree.iconify.data.keys.XposedKey
 import com.drdisagree.iconify.xposed.ModPack
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.ResourceHookManager
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.XposedHook.Companion.findClass
@@ -23,6 +19,7 @@ import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.setField
 import com.drdisagree.iconify.xposed.utils.XPrefs.Xprefs
 import de.robv.android.xposed.XposedHelpers.findField
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import kotlin.math.roundToInt
 
 @SuppressLint("DiscouragedApi")
 class QSTransparency(context: Context) : ModPack(context) {
@@ -31,27 +28,25 @@ class QSTransparency(context: Context) : ModPack(context) {
     private var qsTransparencyActive = false
     private var onlyNotifTransparencyActive = false
     private var keepLockScreenShade = false
-    private var alpha = 60f
+    private var qsAlpha = 60f
     private var blurEnabled = false
     private var blurRadius = 23
     private var quickSettingsController: Any? = null
 
     override fun updatePrefs(vararg key: String) {
         Xprefs.apply {
-            qsTransparencyActive = getBoolean(QS_TRANSPARENCY_SWITCH, false)
-            onlyNotifTransparencyActive = getBoolean(NOTIF_TRANSPARENCY_SWITCH, false)
-            keepLockScreenShade = getBoolean(LOCKSCREEN_SHADE_SWITCH, false)
-            alpha = (getSliderInt(QSALPHA_LEVEL, 60).toFloat() / 100.0).toFloat()
-            blurEnabled = getBoolean(QSPANEL_BLUR_SWITCH, false)
-            blurRadius = getSliderInt(BLUR_RADIUS_VALUE, 23)
+            qsTransparencyActive = getBoolean(XposedKey.QUICK_SETTINGS_TRANSPARENCY)
+            onlyNotifTransparencyActive = getBoolean(XposedKey.NOTIFICATION_TRANSPARENCY)
+            keepLockScreenShade = getBoolean(XposedKey.LOCKSCREEN_SHADE)
+            qsAlpha = getFloat(XposedKey.QUICK_SETTINGS_ALPHA_LEVEL) / 100f
+            blurEnabled = getBoolean(XposedKey.QUICK_SETTINGS_BLUR)
+            blurRadius = getInt(XposedKey.QUICK_SETTINGS_BLUR_RADIUS)
         }
 
-        if (key.isNotEmpty() &&
-            (key[0] == QS_TRANSPARENCY_SWITCH ||
-                    key[0] == NOTIF_TRANSPARENCY_SWITCH ||
-                    key[0] == QSALPHA_LEVEL)
-        ) {
-            updateQsScrimRadius()
+        when (key.firstOrNull()) {
+            XposedKey.QUICK_SETTINGS_TRANSPARENCY.name,
+            XposedKey.NOTIFICATION_TRANSPARENCY.name,
+            XposedKey.QUICK_SETTINGS_ALPHA_LEVEL.name -> updateQsScrimRadius()
         }
     }
 
@@ -61,6 +56,24 @@ class QSTransparency(context: Context) : ModPack(context) {
     }
 
     private fun setQsTransparency() {
+        val shadeColorsClass = findClass("$SYSTEMUI_PACKAGE.shade.ui.ShadeColors")
+
+        shadeColorsClass
+            .hookMethod("shadePanel")
+            .runAfter { param ->
+                if (!qsTransparencyActive && !onlyNotifTransparencyActive) return@runAfter
+                if (param.result == null) return@runAfter
+
+                val blurSupported = param.args[1] as Boolean
+
+                if (!blurSupported) return@runAfter
+
+                param.result = ColorUtils.setAlphaComponent(
+                    param.result as Int,
+                    (255 * qsAlpha).roundToInt()
+                )
+            }
+
         val scrimControllerClass = findClass("$SYSTEMUI_PACKAGE.statusbar.phone.ScrimController")
 
         scrimControllerClass
@@ -72,48 +85,38 @@ class QSTransparency(context: Context) : ModPack(context) {
                 val scrimState = param.thisObject.getField("mState").toString()
 
                 if (scrimState == "KEYGUARD") {
-                    if (!keepLockScreenShade) {
-                        param.args[alphaIndex] = 0.0f
-                    }
+                    if (!keepLockScreenShade) param.args[alphaIndex] = 0.0f
                 } else if (scrimState.contains("BOUNCER")) {
                     param.args[alphaIndex] = param.args[alphaIndex] as Float * keyguardAlpha
                 } else {
-                    val scrimName = when {
+                    val scrimName = when (param.args[0]) {
                         findField(
                             scrimControllerClass,
                             "mScrimInFront"
-                        )[param.thisObject] == param.args[0] -> {
-                            "front_scrim"
-                        }
+                        )[param.thisObject] -> "front_scrim"
 
                         findField(
                             scrimControllerClass,
                             "mScrimBehind"
-                        )[param.thisObject] == param.args[0] -> {
-                            "behind_scrim"
-                        }
+                        )[param.thisObject] -> "behind_scrim"
 
                         findField(
                             scrimControllerClass,
                             "mNotificationsScrim"
-                        )[param.thisObject] == param.args[0] -> {
-                            "notifications_scrim"
-                        }
+                        )[param.thisObject] -> "notifications_scrim"
 
-                        else -> {
-                            "unknown_scrim"
-                        }
+                        else -> "unknown_scrim"
                     }
 
                     when (scrimName) {
                         "behind_scrim" -> {
                             if (!onlyNotifTransparencyActive) {
-                                param.args[alphaIndex] = param.args[alphaIndex] as Float * alpha
+                                param.args[alphaIndex] = param.args[alphaIndex] as Float * qsAlpha
                             }
                         }
 
                         "notifications_scrim" -> {
-                            param.args[alphaIndex] = param.args[alphaIndex] as Float * alpha
+                            param.args[alphaIndex] = param.args[alphaIndex] as Float * qsAlpha
                         }
 
                         else -> {}
@@ -157,7 +160,7 @@ class QSTransparency(context: Context) : ModPack(context) {
 
                     val readonlyStateFlowInstance = try {
                         readonlyStateFlowClass.constructors[0].newInstance(zeroAlphaFlow)
-                    } catch (ignored: Throwable) {
+                    } catch (_: Throwable) {
                         readonlyStateFlowClass.constructors[0].newInstance(zeroAlphaFlow, null)
                     }
 
@@ -178,13 +181,6 @@ class QSTransparency(context: Context) : ModPack(context) {
         quickSettingsControllerClass
             .hookConstructor()
             .runAfter { param -> quickSettingsController = param.thisObject }
-
-        ResourceHookManager
-            .hookDimen()
-            .whenCondition { qsTransparencyActive && !onlyNotifTransparencyActive && alpha == 0f }
-            .forPackageName(SYSTEMUI_PACKAGE)
-            .addResource("notification_scrim_corner_radius") { 0 }
-            .apply()
     }
 
     private fun updateQsScrimRadius() {

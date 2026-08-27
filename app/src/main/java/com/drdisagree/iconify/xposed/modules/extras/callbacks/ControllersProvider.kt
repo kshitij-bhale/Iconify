@@ -5,7 +5,7 @@ import android.provider.Settings
 import android.view.View
 import com.drdisagree.iconify.data.common.Const.SYSTEMUI_PACKAGE
 import com.drdisagree.iconify.xposed.ModPack
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.getExpandableView
+import com.drdisagree.iconify.xposed.modules.extras.ExpandableViews.Companion.getExpandableView
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.XposedHook.Companion.findClass
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.callMethod
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getField
@@ -17,6 +17,7 @@ import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.log
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.util.concurrent.CopyOnWriteArrayList
 
+@Suppress("Unused")
 class ControllersProvider(context: Context) : ModPack(context) {
 
     private var mBluetoothEnabled = false
@@ -64,7 +65,7 @@ class ControllersProvider(context: Context) : ModPack(context) {
             .runAfter { param -> onWifiChanged(param.args[0]) }
 
         // Internet Tile - for opening Internet Dialog
-        findClass("$SYSTEMUI_PACKAGE.qs.tiles.InternetTile")
+        findClass("$SYSTEMUI_PACKAGE.qs.tiles.InternetTile", suppressError = true)
             .hookConstructor()
             .runAfter { param ->
                 if (mCellularTile == null) {
@@ -432,7 +433,7 @@ class ControllersProvider(context: Context) : ModPack(context) {
                         "create",
                         Boolean::class.java,
                         Boolean::class.java,
-                        expandableClass!!
+                        expandableClass
                     ) -> {
                         instance.mInternetDialogManager.callMethod(
                             "create",
@@ -448,7 +449,7 @@ class ControllersProvider(context: Context) : ModPack(context) {
                         Boolean::class.java,
                         Boolean::class.java,
                         Boolean::class.java,
-                        expandableClass!!
+                        expandableClass
                     ) -> {
                         instance.mInternetDialogManager.callMethod(
                             "create",
@@ -478,7 +479,7 @@ class ControllersProvider(context: Context) : ModPack(context) {
 
                         expandableClassAvailable && cellularTile.isMethodAvailable(
                             "handleClick",
-                            expandableClass!!
+                            expandableClass
                         ) -> {
                             cellularTile.callMethod("handleClick", view.getExpandableView())
                             return true
@@ -539,13 +540,13 @@ class ControllersProvider(context: Context) : ModPack(context) {
 
                 expandableClassAvailable && instance.mBluetoothTileDialogViewModel.isMethodAvailable(
                     "showDialog",
-                    expandableClass!!
+                    expandableClass
                 ) -> {
                     // it's invoking wrong callMethod() so we have to call it manually
                     return try {
                         instance.mBluetoothTileDialogViewModel!!::class.java.getMethod(
                             "showDialog",
-                            instance.mExpandableClass!!
+                            instance.mExpandableClass
                         ).invoke(
                             instance.mBluetoothTileDialogViewModel!!,
                             view.getExpandableView()
@@ -567,7 +568,7 @@ class ControllersProvider(context: Context) : ModPack(context) {
 
                 expandableClassAvailable && mBluetoothTile.isMethodAvailable(
                     "handleClick",
-                    expandableClass!!
+                    expandableClass
                 ) -> {
                     mBluetoothTile.callMethod("handleClick", view.getExpandableView())
                     return true

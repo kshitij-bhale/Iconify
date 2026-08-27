@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_moto">شخصی سازی رابط‌ کاربری خسته کننده اندروید</string>
+    <string name="app_motto">شخصی سازی رابط‌ کاربری خسته کننده اندروید</string>
     <!-- Onboarding -->
     <string name="init_module_installation">راه‌اندازی اولیه</string>
     <string name="step">قدم</string>
@@ -20,17 +20,35 @@
     <string name="onboarding_title_3">اکنون شروع کنیم؟</string>
     <string name="onboarding_subtitle_3">اکنون زمان آن است که آیکونیفای یک سری کار های داخلی انجام دهد.</string>
     <string name="onboarding_desc_3">شروع وظایف داخلی، علامت گذاری شروع کار ضروری. آماده آغاز هستید؟</string>
+    <string name="grant_permission">اعطای مجوز</string>
     <string name="need_storage_perm_title">دسترسی حافظه مورد نیاز است</string>
     <string name="need_storage_perm_desc">دسترسی به حافظه برای ساخت برخی پرونده های ضروری لازم است.</string>
+    <string name="notification_perm_title">اجازه دادن به اعلان‌ها</string>
+    <string name="notification_perm_desc">برای اطلاع‌رسانی در مورد به‌روزرسانی‌های موجود و نمایش اعلان‌های آزمایشی مورد نیاز است.</string>
+    <string name="optional_permission">اعطای این مجوزها اختیاری است!</string>
     <string name="compatible_root_not_found_title">روش روت سازگار یافت نشد</string>
     <string name="compatible_root_not_found_desc">برای ادامه از هر کدام از روش های محبوب روت استفاده کنید.</string>
     <string name="root_not_found_title">روت در دسترس نیست</string>
     <string name="root_not_found_desc">ظاهرا دستگاه شما روت نشده است!</string>
+    <string name="metamodule_not_found_title">متاماژول نصب نشده است</string>
+    <string name="metamodule_not_found_desc">KernelSU 3.0.0 و جدیدتر برای فعال کردن تغییرات بدون سیستم/سیستمی به متاماژول نیاز دارند.</string>
     <string name="need_reboot_title">نیازمند بازراه‌اندازی دستگاه</string>
     <string name="need_reboot_desc">دستگاهتان را بازراه‌اندازی کنید تا پرونده های مورد نیاز در مکان باید قرار گیرند.</string>
     <string name="installation_failed_title">اوه انتظار این را نداشتیم</string>
     <string name="installation_failed_desc">ظاهرا مشکلی پیش آمده است.\nبرای کمک به حل مشکل لاگ برنامه را برای سازنده ارسال کنید.</string>
     <string name="logs">گزارش‌ها</string>
+    <!-- Disclaimer -->
+    <string name="disclaimer">سلب مسئولیت</string>
+    <string name="disclaimer_1_title">دسترسی به ریشه &amp; محیط</string>
+    <string name="disclaimer_1_description">این برنامه برای تغییر منابع سیستم به دسترسی روت از طریق مجسیک، KernelSU یا APatch نیاز دارد.\nاگرچه LSPosed اختیاری است، اما برای بهترین سازگاری و پشتیبانی از ویژگی‌های پیشرفته، اکیداً توصیه می‌شود.\nاین برنامه از شما مجوزهای ابر‌کاربر را درخواست می‌کند؛ بدون آنها، هیچ تغییری در سیستم شما اعمال نمی‌شود.</string>
+    <string name="disclaimer_2_title">هم‌پوشانی &amp; تغییرات سیستم</string>
+    <string name="disclaimer_2_description">Iconify با تولید و تزریق مستقیم هم‌پوشانی پویای منابع زمان اجرا (RRO) به سیستم، توابع را اجرا می‌کند.\nاین تغییرات برای رام‌های مبتنی بر AOSP طراحی شده‌اند و ممکن است با پوسته‌های OEM به شدت اصلاح‌شده (مانند HyperOS، Realme UI یا OneUI) تداخل داشته باشند.\nتغییر مقادیر خاص سیستم ممکن است بسته به نسخه خاص اندروید شما باعث هنگ کردن رابط کاربری یا خطای \"رابط کاربری سیستم متوقف شده است\" شود.</string>
+    <string name="disclaimer_3_title">خطر بوت لوپ &amp; بازیابی</string>
+    <string name="disclaimer_3_description">تغییر فایل‌های سیستمی خطر ذاتی ایجاد بوت‌لوپ را به همراه دارد که در آن دستگاه از کار می‌افتد.\nقبل از ادامه، مطمئن شوید که یک ریکاوری سفارشی (مانند TWRP، OrangeFox) نصب کرده‌اید.\nهمیشه ترکیب کلیدهای سخت‌افزاری لازم برای بوت شدن دستگاهتان به «حالت ایمن» را بدانید، که می‌تواند در مواقع اضطراری همه ماژول‌ها را غیرفعال کند.</string>
+    <string name="disclaimer_4_title">بدون ضمانت &amp; مسئولیت</string>
+    <string name="disclaimer_4_description">این نرم‌افزار «به همین شکل» تحت مجوز GPL-3.0 و بدون هیچ گونه ضمانت صریح یا ضمنی ارائه می‌شود.\nتوسعه‌دهنده از نظر قانونی یا مالی مسئولیتی در قبال سخت‌افزار از کار افتاده، کارت‌های جانبی خراب یا «صفحه‌های سیاه» غیرمنتظره ندارد.\nبا استفاده از این برنامه، شما تأیید می‌کنید که نرم‌افزار اصلی دستگاه خود را به صلاحدید خود تغییر می‌دهید.</string>
+    <string name="disclaimer_5_title">ایمنی &amp; مسئولیت‌پذیری داده‌ها</string>
+    <string name="disclaimer_5_description">پشتیبان‌گیری الزامی است: همیشه قبل از انجام تنظیمات عمیق سیستم، از عکس‌ها، مخاطبین و فایل‌های خود یک نسخه پشتیبان خارج از دستگاه تهیه کنید.\nاین وظیفه شماست که با بررسی مستندات رسمی گیت‌هاب یا گروه‌های اجتماعی، سازگاری با رام خود را تأیید کنید.\nاگر مطمئن نیستید که چگونه یک ماژول مجسیک را به صورت دستی از طریق ADB حذف کنید، لطفاً تغییرات پیشرفته را انجام ندهید.</string>
     <!-- Search Preference -->
     <string name="search_title">جستجو</string>
     <string name="searchpreference_search">جستجو…</string>
@@ -39,6 +57,7 @@
     <string name="searchpreference_more">بیشتر</string>
     <string name="searchpreference_clear_history">پاک کردن تاریخچه</string>
     <string name="searchpreference_no_result">بدون نتیجه</string>
+    <string name="recent_searches">جستجوهای اخیر</string>
     <!-- Home -->
     <string name="activity_title_home_page">آیکونیفای</string>
     <string name="activity_title_icon_pack">آیکون‌ها</string>
@@ -98,6 +117,7 @@
     <!-- Settings -->
     <string name="settings_section_title_general">عمومی</string>
     <string name="settings_app_language">زبان</string>
+    <string name="settings_app_language_desc">زبان برنامه خود را انتخاب کنید</string>
     <string name="settings_app_icon">نماد برنامه</string>
     <string name="settings_app_icon_default">نماد پیشفرض</string>
     <string name="settings_app_icon_themed">نماد پویا</string>
@@ -112,7 +132,7 @@
     <string name="settings_auto_update_title">به‌روزرسانی خودکار</string>
     <string name="settings_auto_update_desc">بررسی برای نسخه جدید در پس‌زمینه.</string>
     <string name="settings_auto_update_title_wifi_only">تنها با وای‌فای بررسی کن</string>
-    <string name="settings_auto_update_desc_wifi_only">به‌روزرسانی ها را تنها با وای‌فای بررسی کن.</string>
+    <string name="settings_auto_update_desc_wifi_only">فقط زمانی که به وای فای متصل هستید، به‌روزرسانی‌ها را در پس‌زمینه بررسی کنید</string>
     <string name="settings_section_title_xposed">Xposed</string>
     <string name="settings_show_warning_title">نمایش هشدارها</string>
     <string name="settings_show_warning_desc">نمایش هشدار در مورد نحوه باز-بهینه‌سازی ماژول در منوی Xposed.</string>
@@ -220,7 +240,7 @@
     <string name="icon_mask_style_scroll">پیمایش</string>
     <string name="icon_mask_style_square">مربع</string>
     <string name="icon_mask_style_teardrop">قطره اشک</string>
-    <string name="icon_mask_style_rounded_rectangle">گرد\nمستطیل</string>
+    <string name="icon_mask_style_rounded_rectangle">مستطیل گرد</string>
     <string name="icon_mask_style_ios">iOS</string>
     <string name="icon_mask_style_cloudy">ابری</string>
     <string name="icon_mask_style_cylinder">سیلندر</string>
@@ -228,10 +248,10 @@
     <string name="icon_mask_style_heart">قلب</string>
     <string name="icon_mask_style_leaf">برگ</string>
     <string name="icon_mask_style_stretched">کشیده شده</string>
-    <string name="icon_mask_style_tapered_rectangle">مخروطی\nمستطیل</string>
+    <string name="icon_mask_style_tapered_rectangle">مستطیل مخروطی</string>
     <string name="icon_mask_style_vessel">کشتی</string>
     <string name="icon_mask_style_rice_rohie_meow">روهی میو</string>
-    <string name="icon_mask_style_force_round">نیروی دور</string>
+    <string name="icon_mask_style_round">گرد</string>
     <!-- Color Engine -->
     <string name="activity_title_basic_colors">بخش انتخاب رنگ</string>
     <string name="activity_desc_basic_colors">رنگ مورد نظر خود را در این قسمت انتخاب کنید</string>
@@ -327,11 +347,19 @@
     <string name="qs_panel_top_margin_info">دستگاه را برای دیدن تغییرات بچرخانید. اگر کار نمرد رابط را راه‌اندازی مجدد کنید.</string>
     <!-- Statusbar -->
     <string name="section_title_spacing">فضادهی</string>
-    <string name="sb_left_padding">تنظیم حاشیه سمت چپ</string>
-    <string name="sb_right_padding">تنظیم حاشیه سمت راست</string>
+    <string name="sb_start_padding">بالشتک شروع</string>
+    <string name="sb_end_padding">بالشتک پایانی</string>
     <string name="sb_height">ارتفاع</string>
+    <string name="section_title_icon_sizes">اندازه آیکون‌ها</string>
+    <string name="sb_signal_icon_size_title">بزرگنمایی نمادهای سیگنال</string>
+    <string name="sb_signal_icon_size_desc">افزایش اندازه آیکون سیگنال برای بسته‌های آیکون سفارشی</string>
+    <string name="sb_wifi_icon_size_title">بزرگنمایی آیکون‌های وای‌فای</string>
+    <string name="sb_wifi_icon_size_desc">افزایش اندازه آیکون وای‌فای برای بسته‌های آیکون سفارشی</string>
+    <string name="sb_network_type_size_title">بزرگنمایی آیکون‌های نوع شبکه</string>
+    <string name="sb_network_type_size_desc">افزایش اندازه نشانگر نوع شبکه برای بسته‌های آیکون سفارشی</string>
+    <string name="hint_icon_size_increase">آیکون‌ها خیلی کوچک به نظر می‌رسند؟ برای تنظیم اندازه آیکون‌ها اینجا را لمس کنید</string>
     <string name="section_title_color">رنگ</string>
-    <string name="sb_color_tint_title">افکت ته رنگ</string>
+    <string name="sb_color_tint_title">رنگ آیکون نوار وضعیت</string>
     <string name="sb_color_tint_desc">فعال کردن افکت ته رنگ برای آیکون‌ها و متن‌های نوارابزار</string>
     <string name="sb_tint_system">رنگ پیش‌فرض سیستم</string>
     <string name="sb_tint_monet">رنگ مونه/لهجه</string>
@@ -507,6 +535,7 @@
     <string name="lockscreen_device_widget_style_classic">نوار با دو قوس</string>
     <string name="lockscreen_device_widget_style_arcs">چهار قوس</string>
     <!-- LS Widgets Actions -->
+    <string name="none">هیچ</string>
     <string name="camera">دوربین</string>
     <string name="clock_timer">ساعت/تایمر</string>
     <string name="calculator">ماشین حساب</string>
@@ -684,8 +713,16 @@
     <string name="volume_percentage_desc">نمایش درصد باتری بالای نوار تنظیم صدا</string>
     <string name="safety_warning_title">هشدار ایمنی</string>
     <string name="safety_warning_desc">هشدار ایمنی در حجم صدای بالا</string>
+    <string name="app_volume_button_title">صدای هر برنامه</string>
+    <string name="app_volume_button_desc">دکمه منو را در پنل صدا برای فعال کردن منابع صوتی، طولانی فشار دهید</string>
+    <string name="multi_audio_focus_title">چندین منبع صدا</string>
+    <string name="multi_audio_focus_desc">به چندین برنامه اجازه دهید همزمان صدا پخش کنند. نیاز به راه‌اندازی مجدد کامل دستگاه دارد.</string>
     <string name="colored_ringer_icon_title">نماد زنگ رنگی</string>
     <string name="colored_ringer_icon_desc">اگر نماد زنگ انتخاب شده نامرئی باشد، فعال شود</string>
+    <string name="volume_sheet_app_volume">صدای برنامه</string>
+    <string name="volume_sheet_no_active_source">هیچ منبع فعالی یافت نشد</string>
+    <string name="volume_sheet_active_sources_count_format">منابع فعال: %d</string>
+    <string name="volume_sheet_play_music_or_video">یک موسیقی یا ویدیو پخش کنید و دوباره این پنل را باز کنید.</string>
     <!-- Xposed Header Image -->
     <string name="header_image_title">انتخاب فایل تصویر هدر</string>
     <string name="header_image_desc">اصافه کردن تصویر به هدر نوارابزار\nفایل تصویر را از بخش فایل‌های اخیر انتخاب نکنید</string>
@@ -697,6 +734,8 @@
     <string name="header_image_zoom_to_fit_desc">به صورت پیش‌فرض توصیر کشیده می‌شود تا به درستی قرار بگیرد</string>
     <string name="header_image_hide_in_landscape_title">مخفی در افقی</string>
     <string name="header_image_hide_in_landscape_desc">مخفی کردن تصویر در حالت افقی</string>
+    <string name="header_image_half_width_in_landscape_title">نیم عرض در افقی</string>
+    <string name="header_image_half_width_in_landscape_desc">تنظیم عرض تصویر به اندازه نصف صفحه نمایش در حالت افقی</string>
     <string name="header_image_alpha_gradient_title">گرادیان آلفا</string>
     <string name="header_image_alpha_gradient_desc">جلوه محو شده را به تصویر سربرگ اضافه کنید</string>
     <!-- Xposed Header Clock -->
@@ -710,6 +749,7 @@
     <string name="header_clock_color_picker_title">انتخابگر رنگ ساعت</string>
     <string name="header_clock_color_picker_desc">رنگ متن ساعت سرصفحه را تنظیم کنید</string>
     <string name="header_clock_expansion_y_title">مقدار گسترش</string>
+    <string name="header_clock_landscape_offset_y_title">انحراف Y در افقی</string>
     <string name="header_clock_font_text_scaling_title">مقیاس نوشته</string>
     <string name="header_clock_side_margin_title">حاشیه کناری</string>
     <string name="header_clock_top_margin_title">حاشیه بالا</string>
@@ -717,6 +757,8 @@
     <string name="header_clock_white_text_desc">متن ساعت همیشه سفید باشد</string>
     <string name="header_clock_center_clock_title">ساعت در مرکز</string>
     <string name="header_clock_center_clock_desc">ساعت را به مرکز دید منتقل کنید</string>
+    <string name="header_clock_half_width_in_landscape_title">نیم عرض در افقی</string>
+    <string name="header_clock_half_width_in_landscape_desc">عرض طرح را در حالت افقی روی نیمی از صفحه تنظیم کنید</string>
     <string name="header_clock_hide_landscape_title">مخفی در افقی</string>
     <string name="header_clock_hide_landscape_desc">پنهان کردن ساعت در حالت افقی</string>
     <!-- Xposed Lockscreen Clock -->
@@ -729,6 +771,8 @@
     <string name="lockscreen_clock_move_notification_icon_desc">نمادهای همیشه روشن را به زیر ساعت سفارشی منتقل کنید، ممکن است در رام‌های قدیمی‌تر باگ داشته باشد</string>
     <string name="lockscreen_clock_font_title">فونت ساعت</string>
     <string name="lockscreen_clock_font_desc">برای ساعت قفل صفحه از فونت سفارشی استفاده کنید</string>
+    <string name="lockscreen_clock_image1_title">تصویر سفارشی ۱</string>
+    <string name="lockscreen_clock_image2_title">تصویر سفارشی ۲</string>
     <string name="lockscreen_clock_image_title">تصویر سفارشی</string>
     <string name="lockscreen_clock_image_desc">استفاده از تصویر سفارشی برای ساعت صفحه‌قفل</string>
     <string name="lsclock_custom_color_title">رنگ ساعت سفارشی</string>
@@ -782,6 +826,7 @@
     <string name="wallpaper_background_sensitivity_title">حساسیت پس زمینه</string>
     <string name="depth_wallpaper_model_ready">مدل هوش مصنوعی بر روی دستگاه دانلود می شود</string>
     <string name="depth_wallpaper_model_not_available">مدل هوش مصنوعی در دستگاه موجود نیست (هنوز)</string>
+    <string name="depth_wallpaper_model_checking">بررسی در دسترس بودن مدل هوش مصنوعی…</string>
     <string name="depth_wallpaper_subject_extraction_started">در حال استخراج موضوع تصویر‌زمینه…</string>
     <string name="depth_wallpaper_subject_extraction_success">موضوع تصویر‌زمینه یافت شد!</string>
     <string name="depth_wallpaper_subject_extraction_failed">موضوع تصویر زمینه یافت نشد!</string>
@@ -796,10 +841,14 @@
     <string name="statusbar_clock_clickable_title">ساعت قابل کلیک</string>
     <string name="statusbar_clock_clickable_desc">برای بازکردن برنامه ساعت کلیک کنید</string>
     <string name="section_title_text">متن</string>
-    <string name="statusbar_clock_text_title">رنگ متن ساعت</string>
-    <string name="sbclock_color_follow_system">پیروی از سیستم</string>
-    <string name="sbclock_color_transparent_text">متن شفاف</string>
-    <string name="sbclock_color_custom_color">رنگ سفارشی</string>
+    <string name="statusbar_clock_text_color_title">رنگ متن ساعت</string>
+    <string name="sbclock_text_color_follow_system">پیروی از سیستم</string>
+    <string name="sbclock_text_color_transparent_text">متن شفاف</string>
+    <string name="sbclock_text_color_custom_color">رنگ سفارشی</string>
+    <string name="statusbar_clock_fill_color_title">رنگ پرکننده ساعت</string>
+    <string name="sbclock_fill_color_accent">@string/apply_monet_accent_title</string>
+    <string name="sbclock_fill_color_gradient">@string/apply_monet_gradient_title</string>
+    <string name="sbclock_fill_color_custom">@string/sbclock_text_color_custom_color</string>
     <string name="clock_text_color_picker_title">انتخابگر رنگ متن</string>
     <string name="clock_text_color_picker_desc">تنظیم رنگ متن ساعت نوار‌اعلان</string>
     <string name="section_title_status_icons">نمادهای وضعیت</string>
@@ -818,8 +867,10 @@
     <string name="fill_end_color">پر کردن رنگ پایانی</string>
     <string name="section_title_border">حاشیه</string>
     <string name="enable_border">فعال کردن حاشیه</string>
-    <string name="accent_border_color">رنگ حاشیه تاکیدی</string>
-    <string name="border_color">رنگ لبه</string>
+    <string name="border_color_title">رنگ لبه</string>
+    <string name="border_color_accent">رنگ تاکیدی</string>
+    <string name="border_color_custom">رنگ سفارشی</string>
+    <string name="border_color_custom_title">رنگ سفارشی لبه</string>
     <string name="dashed_border">مرز خط تیره</string>
     <string name="dash_width">عرض خط تیره</string>
     <string name="dash_gap">فاصله خط تیره</string>
@@ -904,6 +955,8 @@
     <string name="status_bar_logo_style_custom">تصویر سفارشی</string>
     <string name="status_bar_logo_tint_title">دنبال‌کردن رنگ نوار وضعیت</string>
     <string name="status_bar_logo_tint_desc">تغییر به پس‌زمینه روشن/تاریک برای به‌روزرسانی رنگ</string>
+    <string name="status_bar_logo_chooser_title">انتخاب تصویر لوگو</string>
+    <string name="status_bar_logo_chooser_desc">انتخاب تصویر لوگوی دلخواه</string>
     <!-- Xposed Dual Statusbar -->
     <string name="dsb_title">نواراعلان دو ردیفه</string>
     <string name="dsb_portrait_only_title">فقط حالت عمودی</string>
@@ -937,13 +990,33 @@
     <string name="ls_wallpaper_blur_title">تاری تصویر زمینه</string>
     <string name="ls_wallpaper_blur_desc">اعمال جلوه تاری روی صفحه قفل</string>
     <string name="ls_wallpaper_blur_radius_title">شدت تاری تصویر زمینه</string>
+    <string name="activity_title_lockscreen_visualizer">رقص‌نور موسیقی</string>
+    <string name="activity_desc_lockscreen_visualizer">نمایش رقص‌نور موسیقی در صفحه قفل</string>
+    <string name="lockscreen_visualizer_color_mode_title">حالت رنگ</string>
+    <string name="lockscreen_visualizer_static_color_title">رنگ</string>
+    <string name="lockscreen_visualizer_gradient_start_title">رنگ شروع</string>
+    <string name="lockscreen_visualizer_gradient_end_title">رنگ پایان</string>
+    <string name="lockscreen_visualizer_lava_speed_title">سرعت جریان</string>
+    <string name="lockscreen_visualizer_sensitivity_title">حساسیت</string>
+    <string name="lockscreen_visualizer_height_title">ارتفاع رقص‌نور</string>
+    <string name="lockscreen_visualizer_bar_thickness_title">ضخامت میله</string>
+    <string name="lockscreen_visualizer_smoothness_title">همواری</string>
+    <string name="lockscreen_visualizer_fps_title">فریم رقص‌نور</string>
     <!-- Changelog -->
     <string name="activity_title_changelog">تغییرات اخیر برنامه</string>
     <string name="no_internet_connection">ارتباط با سرور برقرار نشد. ممکن است مشکل از اینترنت شما یا سرور باشد. لطفا بعدا دوباره امتحان کنید</string>
     <string name="changelog_not_found">فایل تغییرات اخیر پیدا نشد. ممکن است مشکل از اینترنت شما یا سرور باشد. لطفا بعدا دوباره امتحان کنید.</string>
     <string name="individual_changelog_not_found">مشکلی پیش آمده است.\nاین گزارش تغییرات ممکن است در سرور موجود نباشد.</string>
+    <string name="changelog_changes_in">تغییرات در %1$s</string>
+    <string name="changelog_changes_since">تغییرات از %1$s</string>
     <!-- App Updates -->
+    <string name="settings_section_title_updates">به‌روزرسانی‌ها</string>
+    <string name="settings_app_update_checker_title">به‌روزرسانی برنامه</string>
+    <string name="check_for_updates_button">بررسی به‌روزرسانی</string>
+    <string name="download_update_button">نصب به‌روزرسانی</string>
     <string name="checking_for_update">درحال بررسی وجود آپدیت</string>
+    <string name="downloading_update">نصب به‌روزرسانی\n(%d%%)</string>
+    <string name="installing_update">درخواست نصب…</string>
     <string name="update_available">آپدیت جدید در دسترس است!</string>
     <string name="update_dialog_desc">آپدیت %s آماده دانلود است.</string>
     <string name="view_changelog">نمایش تغییرات اخیر</string>
@@ -1053,6 +1126,8 @@
     <string name="btn_disable_custom_colors">غیرفعال کردن رنگ‌های انتخاب شده</string>
     <string name="btn_enable_custom_colors">فعال کردن رنگ‌های انتخاب شده</string>
     <string name="btn_reset">بازنشانی به حالت اولیه</string>
+    <string name="btn_decrease">کاهش</string>
+    <string name="btn_increase">افزایش</string>
     <string name="btn_reboot_now">همین الان ریستارت کن!</string>
     <string name="btn_download">دانلود</string>
     <string name="btn_restart_systemui">ریستارت کردن رابط کاربری</string>
@@ -1062,6 +1137,7 @@
     <string name="btn_skip">پرش</string>
     <string name="btn_next">بعدی</string>
     <string name="btn_back">برگشت</string>
+    <string name="btn_agree">موافقم</string>
     <string name="btn_lets_go">بزن بریم</string>
     <string name="btn_close">بستن</string>
     <string name="btn_positive">بله</string>
@@ -1097,6 +1173,8 @@
     <string name="toast_selected_successfully">با موفقیت انتخاب شد</string>
     <string name="toast_unavailable">موجود نیست</string>
     <string name="toast_use_from_xposed_menu">برای این ویژگی از منوی Xposed استفاده کنید</string>
+    <string name="toast_downgrade_kernelsu">برنامه KernelSU را به نسخه پایین‌تر برگردانید و دوباره امتحان کنید</string>
+    <string name="toast_reboot_and_try_again">دستگاه را مجدداً راه‌اندازی و دوباره امتحان کنید</string>
     <!-- Push Notification -->
     <string name="new_update_title">به‌روزرسانی موجود است</string>
     <string name="new_update_desc">نسخه جدید Iconify در دسترس است.</string>
@@ -1161,6 +1239,7 @@
     <string name="force_enable_blur_desc">تاری اجباری را برای رام های پشتیبانی نشده فعال کنید</string>
     <string name="choose_header_image">انتخاب تصویر سربرگ</string>
     <string name="choose_clock_font">انتخاب قلم ساعت</string>
+    <string name="choose_weather_font">فونت آب و هوا را انتخاب کنید</string>
     <string name="pick_style">سبک دلخواه خود را انتخاب کنید</string>
     <string name="attention">توجه!</string>
     <string name="method_toggle_dark_mode">دوبار تغییر حالت تاریک</string>
@@ -1200,6 +1279,7 @@
     <string name="learn_more">بیشتر بدانید</string>
     <string name="custom_tiles_footer_info">برای اطمینان از عملکرد صحیح کاشی‌های سفارشی، ابتدا یک بار از کاشی‌های پیش‌فرض اینترنت و بلوتوث استفاده کنید، سپس از کاشی‌های سفارشی استفاده کنید.</string>
     <string name="hig_res_image_footer_info">از استفاده از تصاویر با وضوح بالا خودداری کنید، زیرا ممکن است باعث خراب شدن رابط کاربری سیستم شما شوند.</string>
+    <string name="qs_grid_footer_info">برای اعمال تغییرات، حالت تاریک را دو بار فعال یا غیرفعال کنید یا رابط سیستم را مجدداً راه‌اندازی کنید.</string>
     <string name="more">بیشتر</string>
     <!-- Weather -->
     <!-- Omni Jaws Strings -->
@@ -1215,8 +1295,6 @@
     <string name="settings_title">تنظیمات</string>
     <string name="auto_update_title">به‌روز رسانی خودکار</string>
     <string name="auto_update_summary">هر چند وقت یکبار نسخه های جدید را بررسی کنید</string>
-    <string name="update_over_wifi_title">به‌روزرسانی‌ها را فقط از طریق WiFi بررسی کنید</string>
-    <string name="update_over_wifi_summary">فقط زمانی که به وای فای متصل هستید، به‌روزرسانی‌ها را در پس‌زمینه بررسی کنید</string>
     <string name="unit_metric">متریک (u00b0C\)</string>
     <string name="unit_imperial">مایل (\u00b0F)</string>
     <string name="update">به‌روزرسانی</string>
@@ -1359,4 +1437,72 @@
     <string name="switch_theme_required_desc">در صورت بروز رفتار غیرمنتظره، بین پوسته های روشن و تاریک جابه جا شوید.</string>
     <string name="device_rotation_required_title">بوسته چرخش دستگاه</string>
     <string name="device_rotation_required_desc">چرخش دستگاه خود را برای اعمال آن تغییر دهید.</string>
+    <string name="hex_color">کد رنگ</string>
+    <string name="hex_color_prefix">#</string>
+    <string name="enter_6_or_8_hex_digits">۶ (RRGGBB) یا ۸ (AARRGGBB) رقم هگز وارد کنید</string>
+    <string name="btn_pick_video">انتخاب ویدیو</string>
+    <string name="btn_pick_audio">انتخاب صدا</string>
+    <string name="btn_pick_pdf">انتخاب پی دی اف</string>
+    <string name="btn_pick_document">انتخاب سند</string>
+    <string name="btn_pick_file">انتخاب پرونده</string>
+    <string name="btn_replace_file">جایگزینی</string>
+    <string name="file_unknown_name">پرونده ناشناخته</string>
+    <string name="file_clear">پاک‌کردن</string>
+    <string name="advanced_color_settings_title">تنظیمات پیشرفته</string>
+    <string name="advanced_color_settings_desc">سفارشی‌سازی‌های پیشرفته رنگ را دریافت کنید</string>
+    <string name="look_and_feel_title">شکل &amp; شمایل</string>
+    <string name="look_and_feel_desc">پوسته، کنتراست و رنگ‌ها</string>
+    <string name="ok">قبول</string>
+    <string name="no_key_provided">کلید ارائه نشده است</string>
+    <string name="hide_default_battery_desc">نماد باتری پیش‌فرض را از نوار وضعیت پنهان کنید</string>
+    <string name="requires_link_to_custom_color">فعال کردن «پیوند به رنگ سفارشی» در اکسپوزد &gt; نوار وضعیت الزامی است</string>
+    <string name="choose_custom_color">انتخاب رنگ سفارشی</string>
+    <string name="statusbar_switch_between_light_and_dark">برای به‌روزرسانی رنگ نوار وضعیت، بین تم‌های روشن و تیره جابه‌جا شوید.</string>
+    <string name="theme_color">رنگ زمینه</string>
+    <string name="theme_color_dynamic">پویا</string>
+    <string name="palette_style">سبک پالت</string>
+    <string name="amoled_mode_title">حالت آمولد</string>
+    <string name="amoled_mode_desc">پس‌زمینه مشکی در حالت تاریک</string>
+    <string name="expressive_colors_title">رنگ‌های رسا</string>
+    <string name="expressive_colors_desc">استفاده از رنگ‌های شادتر</string>
+    <string name="contrast_level">سطح کنتراست</string>
+    <string name="contrast_default">پیش‌فرض</string>
+    <string name="contrast_medium">متوسط</string>
+    <string name="contrast_high">زیاد</string>
+    <string name="contrast_reduced">کاهش یافته</string>
+    <string name="animations_title">پویانمایی‌ها</string>
+    <string name="animations_desc">فعال کردن انیمیشن‌های روان، انتقال صفحه و جلوه‌های بازخورد لمسی</string>
+    <string name="blur_effect_title">جلوه تاری</string>
+    <string name="blur_effect_desc">اعمال جلوه تاری به پس‌زمینه‌ها و عناصر رابط کاربری</string>
+    <string name="floating_bottom_bar_title">نوار پایین شناور</string>
+    <string name="floating_bottom_bar_desc">نوار پایین را روی محتوا شناور کنید</string>
+    <string name="display_scale_title">مقیاس نمایش</string>
+    <string name="display_scale_desc">تغییر اندازه عناصر رابط کاربری</string>
+    <string name="text_scale_title">مقیاس متن</string>
+    <string name="text_scale_desc">تغییر اندازه متن</string>
+    <string name="header_image_maximum_height_title">حداکثر ارتفاع</string>
+    <string name="header_image_maximum_height_desc">نمایش تصویر سربرگ در کل تنظیم سریع</string>
+    <string name="fix_notification_expand_button_color_title">رفع مشکل رنگ دکمه باز شدن اعلان‌ها</string>
+    <string name="fix_notification_expand_button_color_desc">رفع مشکل رنگ پس‌زمینه دکمه باز شدن در نسخه بتا اندروید ۱۶ QPR3</string>
+    <string name="quick_settings_theme">پوسته تنظیمات سریع</string>
+    <string name="tile_background_color">رنگ پس زمینه کاشی</string>
+    <string name="icon_color">رنگ نماد</string>
+    <string name="icon_background_color">رنگ پس‌زمینه آیکون</string>
+    <string name="label_color">رنگ برچسب</string>
+    <string name="secondary_label_color">رنگ برچسب ثانویه</string>
+    <string name="dsb_portrait_only_desc">نمایش ردیف‌های دوتایی فقط در حالت عمودی</string>
+    <string name="link_to_custom_color_title">لینک به رنگ دلخواه</string>
+    <string name="link_to_custom_color_desc">از رنگ انتخابی صفحه اصلی &gt; بیشتر &gt; نوار وضعیت استفاده کنید</string>
+    <string name="buy_a_coffee">یک قهوه بخرید</string>
+    <string name="developer_intro_desc">خلق تجربه‌های زیبا و شخصی‌سازی اندروید. اگر Iconify به شما شادی می‌دهد، یک قهوه هم خیلی کمکتان می‌کند! ☕</string>
+    <string name="lead_developer">توسعه‌دهندهٔ ارشد</string>
+    <string name="pick_a_color">یک رنگ را انتخاب کنید</string>
+    <string name="section_title_appearance">ظاهر</string>
+    <string name="section_title_additional_settings">تنظیمات اضافی</string>
+    <string name="section_title_active_tile_colors">رنگ‌های کاشی فعال</string>
+    <string name="section_title_inactive_tile_colors">رنگ‌های کاشی غیر‌فعال</string>
+    <string name="section_title_disabled_tile_colors">رنگ‌های کاشی خاموش</string>
+    <!-- Search -->
+    <string name="search_settings_hint">جستجو تنظیمات…</string>
+    <string name="search_no_results">موردی یافت نشد</string>
 </resources>

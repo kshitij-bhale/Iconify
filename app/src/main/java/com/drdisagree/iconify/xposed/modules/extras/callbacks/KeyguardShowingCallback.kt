@@ -5,10 +5,11 @@ import android.content.Context
 import com.drdisagree.iconify.data.common.Const.SYSTEMUI_PACKAGE
 import com.drdisagree.iconify.xposed.ModPack
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.XposedHook.Companion.findClass
-import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.callMethod
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getField
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getFieldSilently
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookConstructor
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookMethod
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookMethodMatchPattern
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.log
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.util.concurrent.CopyOnWriteArrayList
@@ -17,32 +18,27 @@ class KeyguardShowingCallback(context: Context) : ModPack(context) {
 
     @Volatile
     private var isKeyguardState: Boolean = false
-    private var mScrimControllerObj: Any? = null
+    private var keyguardUpdateMonitorInstance: Any? = null
     private val mKeyguardShowingListeners = CopyOnWriteArrayList<KeyguardShowingListener>()
+
+    @Volatile
+    private var stateListenerHooked = false
 
     override fun updatePrefs(vararg key: String) {}
 
     override fun handleLoadPackage(loadPackageParam: XC_LoadPackage.LoadPackageParam) {
         instance = this
 
-        val scrimControllerClass = findClass("$SYSTEMUI_PACKAGE.statusbar.phone.ScrimController")
-        val qsImplClass = findClass(
-            "$SYSTEMUI_PACKAGE.qs.QSImpl",
-            "$SYSTEMUI_PACKAGE.qs.QSFragment"
-        )
+        val notificationPanelViewControllerClass =
+            findClass("$SYSTEMUI_PACKAGE.shade.NotificationPanelViewController")
 
-        scrimControllerClass
-            .hookConstructor()
+        notificationPanelViewControllerClass
+            .hookMethodMatchPattern("onPanelStateChanged.*")
             .runAfter { param ->
-                mScrimControllerObj = param.thisObject
-            }
+                val isKeyguardState =
+                    param.thisObject.getField("mBarState") in listOf(KEYGUARD, SHADE_LOCKED)
 
-        qsImplClass
-            .hookMethod("setQsExpansion")
-            .runAfter { param ->
-                val isKeyguardState = param.thisObject.callMethod("isKeyguardState") as Boolean
-
-                synchronized(this@KeyguardShowingCallback) {
+                synchronized(this) {
                     if (this.isKeyguardState != isKeyguardState) {
                         if (isKeyguardState) {
                             notifyKeyguardShown()
@@ -53,25 +49,6 @@ class KeyguardShowingCallback(context: Context) : ModPack(context) {
                     }
                 }
             }
-
-        fun updateKeyguardState() {
-            if (mScrimControllerObj == null) return
-
-            val isKeyguardState = mScrimControllerObj
-                .getField("mState")
-                .toString() == "KEYGUARD"
-
-            synchronized(instance!!) {
-                if (instance!!.isKeyguardState != isKeyguardState) {
-                    if (isKeyguardState) {
-                        notifyKeyguardShown()
-                    } else {
-                        notifyKeyguardDismissed()
-                    }
-                    instance!!.isKeyguardState = isKeyguardState
-                }
-            }
-        }
 
         val visualStabilityCoordinatorClass =
             findClass("$SYSTEMUI_PACKAGE.statusbar.notification.collection.coordinator.VisualStabilityCoordinator")
@@ -84,7 +61,65 @@ class KeyguardShowingCallback(context: Context) : ModPack(context) {
 
                 mStatusBarStateControllerListener::class.java
                     .hookMethod("onExpandedChanged")
-                    .runAfter runAfter2@{ updateKeyguardState() }
+                    .runAfter runAfter2@{
+                        if (keyguardUpdateMonitorInstance == null) return@runAfter2
+
+                        val isKeyguardState =
+                            keyguardUpdateMonitorInstance.getField("mStatusBarState") in listOf(
+                                KEYGUARD,
+                                SHADE_LOCKED
+                            )
+
+                        synchronized(this) {
+                            if (this.isKeyguardState != isKeyguardState) {
+                                if (isKeyguardState) {
+                                    notifyKeyguardShown()
+                                } else {
+                                    notifyKeyguardDismissed()
+                                }
+                                this.isKeyguardState = isKeyguardState
+                            }
+                        }
+                    }
+            }
+
+        val keyguardUpdateMonitorClass = findClass("com.android.keyguard.KeyguardUpdateMonitor")
+
+        keyguardUpdateMonitorClass
+            .hookConstructor()
+            .runAfter { param ->
+                keyguardUpdateMonitorInstance = param.thisObject
+
+                if (stateListenerHooked) return@runAfter
+
+                val mStatusBarStateControllerListener =
+                    param.thisObject.getFieldSilently("mStatusBarStateControllerListener")
+                        ?: return@runAfter
+                val mStatusBarStateControllerListenerClass =
+                    mStatusBarStateControllerListener.javaClass
+
+                mStatusBarStateControllerListenerClass
+                    .hookMethod("onStateChanged")
+                    .runAfter {
+                        val isKeyguardState =
+                            param.thisObject.getField("mStatusBarState") in listOf(
+                                KEYGUARD,
+                                SHADE_LOCKED
+                            )
+
+                        synchronized(this) {
+                            if (this.isKeyguardState != isKeyguardState) {
+                                if (isKeyguardState) {
+                                    notifyKeyguardShown()
+                                } else {
+                                    notifyKeyguardDismissed()
+                                }
+                                this.isKeyguardState = isKeyguardState
+                            }
+                        }
+                    }
+
+                stateListenerHooked = true
             }
     }
 
@@ -131,5 +166,26 @@ class KeyguardShowingCallback(context: Context) : ModPack(context) {
         fun getInstance(): KeyguardShowingCallback {
             return checkNotNull(instance) { "KeyguardShowingCallback is not initialized yet!" }
         }
+
+        // StatusBarState: https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/StatusBarState.java
+
+        /**
+         * The status bar is in the "normal", unlocked mode or the device is still locked, but we're
+         * accessing camera from power button double-tap shortcut.
+         */
+        const val SHADE: Int = 0
+
+        /**
+         * Status bar is currently the Keyguard. In single column mode, when you swipe from the top of
+         * the keyguard to expand QS immediately, it's still KEYGUARD state.
+         */
+        const val KEYGUARD: Int = 1
+
+        /**
+         * Status bar is in the special mode, where it was transitioned from lockscreen to shade.
+         * Depending on user's security settings, dismissing the shade will either show the
+         * bouncer or go directly to unlocked [.SHADE] mode.
+         */
+        const val SHADE_LOCKED: Int = 2
     }
 }

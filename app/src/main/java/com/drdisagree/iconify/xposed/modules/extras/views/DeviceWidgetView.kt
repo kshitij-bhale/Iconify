@@ -18,9 +18,9 @@ import android.widget.TextView
 import com.drdisagree.iconify.BuildConfig
 import com.drdisagree.iconify.R
 import com.drdisagree.iconify.xposed.modules.extras.callbacks.ThemeChangeCallback
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.findViewContainsTag
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.findViewWithTagAndChangeColor
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.toPx
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.findViewContainingTag
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.findViewWithTagAndChangeColor
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.toPx
 
 class DeviceWidgetView(private val mContext: Context) : FrameLayout(mContext) {
 
@@ -85,14 +85,14 @@ class DeviceWidgetView(private val mContext: Context) : FrameLayout(mContext) {
 
     @SuppressLint("DiscouragedApi")
     private fun setupViews() {
-        mClassicRow = findViewContainsTag("device_widget_classic") as LinearLayout
-        mArcRow = findViewContainsTag("device_widget_arc") as LinearLayout
+        mClassicRow = findViewContainingTag("device_widget_classic") as LinearLayout
+        mArcRow = findViewContainingTag("device_widget_arc") as LinearLayout
 
         // First row
-        mBatteryLevelView = findViewContainsTag("battery_percentage") as TextView
-        mBatteryProgress = findViewContainsTag("battery_progressbar") as ProgressBar
-        mVolumeLevelContainer = findViewContainsTag("volume_progress") as LinearLayout
-        mRamUsageContainer = findViewContainsTag("ram_usage_info") as LinearLayout
+        mBatteryLevelView = findViewContainingTag("battery_percentage") as TextView
+        mBatteryProgress = findViewContainingTag("battery_progressbar") as ProgressBar
+        mVolumeLevelContainer = findViewContainingTag("volume_progress") as LinearLayout
+        mRamUsageContainer = findViewContainingTag("ram_usage_info") as LinearLayout
 
         // Volume progress
         if (mVolumeLevelArcProgress == null) {
@@ -124,14 +124,14 @@ class DeviceWidgetView(private val mContext: Context) : FrameLayout(mContext) {
                 mLinearProgressColor
         )
 
-        (findViewContainsTag("device_name") as TextView).text = Build.MODEL
+        (findViewContainingTag("device_name") as TextView).text = Build.MODEL
 
         // Second Row
-        mVolumeLevelContainerArc = findViewContainsTag("volume_progress_2") as LinearLayout
-        mRamUsageContainerArc = findViewContainsTag("memory_progress") as LinearLayout
+        mVolumeLevelContainerArc = findViewContainingTag("volume_progress_2") as LinearLayout
+        mRamUsageContainerArc = findViewContainingTag("memory_progress") as LinearLayout
 
-        val batteryArc = findViewContainsTag("battery_progress_arc") as LinearLayout
-        val batteryTemp = findViewContainsTag("temperature_progress") as LinearLayout
+        val batteryArc = findViewContainingTag("battery_progress_arc") as LinearLayout
+        val batteryTemp = findViewContainingTag("temperature_progress") as LinearLayout
 
         if (mBatteryPercentArc == null) {
             mBatteryPercentArc = ArcProgressImageView(mContext)
@@ -284,7 +284,7 @@ class DeviceWidgetView(private val mContext: Context) : FrameLayout(mContext) {
 
     fun setDeviceName(deviceName: String?) {
         post {
-            (findViewContainsTag("device_name") as TextView).text =
+            (findViewContainingTag("device_name") as TextView).text =
                 deviceName?.takeIf { !TextUtils.isEmpty(it) } ?: Build.MODEL
         }
     }
@@ -301,7 +301,7 @@ class DeviceWidgetView(private val mContext: Context) : FrameLayout(mContext) {
                 mBatteryReceiver,
                 IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             )
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -310,7 +310,7 @@ class DeviceWidgetView(private val mContext: Context) : FrameLayout(mContext) {
 
         try {
             if (batteryRegistered) mContext.unregisterReceiver(mBatteryReceiver)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 

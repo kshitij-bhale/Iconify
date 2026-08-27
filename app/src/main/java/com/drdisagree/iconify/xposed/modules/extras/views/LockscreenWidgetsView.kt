@@ -23,7 +23,6 @@ import android.media.session.PlaybackState
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -42,32 +41,33 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import com.drdisagree.iconify.BuildConfig
 import com.drdisagree.iconify.R
+import com.drdisagree.iconify.core.utils.OmniJawsClient
 import com.drdisagree.iconify.data.common.Const.FRAMEWORK_PACKAGE
 import com.drdisagree.iconify.data.common.Const.SYSTEMUI_PACKAGE
-import com.drdisagree.iconify.utils.OmniJawsClient
 import com.drdisagree.iconify.xposed.HookEntry.Companion.enqueueProxyCommand
 import com.drdisagree.iconify.xposed.HookRes.Companion.modRes
+import com.drdisagree.iconify.xposed.modules.extras.ActivityLauncherUtils
+import com.drdisagree.iconify.xposed.modules.extras.ExpandableViews.Companion.getExpandableView
+import com.drdisagree.iconify.xposed.modules.extras.LaunchableViews.Companion.createLaunchableImageView
+import com.drdisagree.iconify.xposed.modules.extras.LaunchableViews.Companion.createLaunchableLinearLayout
 import com.drdisagree.iconify.xposed.modules.extras.callbacks.ControllersProvider
 import com.drdisagree.iconify.xposed.modules.extras.callbacks.ThemeChangeCallback
-import com.drdisagree.iconify.xposed.modules.extras.utils.ActivityLauncherUtils
-import com.drdisagree.iconify.xposed.modules.extras.utils.DisplayUtils.isNightMode
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.getExpandableView
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.reAddView
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.toPx
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.DisplayUtils.isNightMode
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.reAddView
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.toPx
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.callMethod
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getField
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.log
-import com.drdisagree.iconify.xposed.modules.lockscreen.widgets.LockscreenWidgets.Companion.launchableImageViewClass
-import com.drdisagree.iconify.xposed.modules.lockscreen.widgets.LockscreenWidgets.Companion.launchableLinearLayoutClass
 import java.lang.reflect.Method
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.min
 
 @SuppressLint("ViewConstructor")
-class LockscreenWidgetsView(private val context: Context, activityStarter: Any?) :
+class LockscreenWidgetsView(private val context: Context) :
     LinearLayout(context), OmniJawsClient.OmniJawsObserver {
 
     private val mContext: Context
@@ -159,8 +159,6 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
 
     // Dozing State
     private var mDozing: Boolean = false
-
-    private var mActivityLauncherUtils: ActivityLauncherUtils
 
     private val mScreenOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -267,18 +265,12 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
     }
 
     private fun createMainWidgetsContainer(context: Context): LinearLayout {
-        val mainWidgetsContainer: LinearLayout = try {
-            launchableLinearLayoutClass!!.getConstructor(Context::class.java)
-                .newInstance(context) as LinearLayout
-        } catch (e: Exception) {
-            // LaunchableLinearLayout not found or other error, ensure the creation of our ImageView
-            LinearLayout(context)
-        }.apply {
+        val mainWidgetsContainer = createLaunchableLinearLayout().apply {
             orientation = HORIZONTAL
             gravity = Gravity.CENTER
             layoutParams = LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
             )
         }
 
@@ -323,19 +315,13 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         }
     }
 
-    private fun createSecondaryWidgetsContainer(context: Context): LinearLayout {
-        val secondaryWidgetsContainer: LinearLayout = try {
-            launchableLinearLayoutClass!!.getConstructor(Context::class.java)
-                .newInstance(context) as LinearLayout
-        } catch (e: Exception) {
-            // LaunchableLinearLayout not found or other error, ensure the creation of our ImageView
-            LinearLayout(context)
-        }.apply {
+    private fun createSecondaryWidgetsContainer(): LinearLayout {
+        val secondaryWidgetsContainer = createLaunchableLinearLayout().apply {
             orientation = HORIZONTAL
             gravity = Gravity.CENTER_HORIZONTAL
             layoutParams = LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
             )
             (layoutParams as MarginLayoutParams).apply {
                 topMargin = modRes.getDimensionPixelSize(R.dimen.kg_widget_margin_vertical)
@@ -345,10 +331,10 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
 
         // Add ImageViews to the secondary widgets container
         mSecondaryWidgetViews = arrayOf(
-            createImageView(context),
-            createImageView(context),
-            createImageView(context),
-            createImageView(context)
+            createImageView(),
+            createImageView(),
+            createImageView(),
+            createImageView()
         )
 
         for (mSecondaryWidgetView: ImageView? in mSecondaryWidgetViews!!) {
@@ -358,14 +344,8 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         return secondaryWidgetsContainer
     }
 
-    private fun createImageView(context: Context): ImageView {
-        val imageView = try {
-            launchableImageViewClass!!.getConstructor(Context::class.java)
-                .newInstance(context) as ImageView
-        } catch (e: Exception) {
-            // LaunchableImageView not found or other error, ensure the creation of our ImageView
-            ImageView(context)
-        }.apply {
+    private fun createImageView(): ImageView {
+        val imageView = createLaunchableImageView().apply {
             id = generateViewId()
             layoutParams = LayoutParams(
                 (mWidgetCircleSize * mWidgetsScale).toInt(),
@@ -403,28 +383,28 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 mContext.getSystemService(MediaSessionManager::class.java)
             var localController: MediaController? = null
             val remoteMediaSessionLists: MutableList<String> = ArrayList()
-            for (controller: MediaController in mediaSessionManager.getActiveSessions(null)) {
-                val pi = controller.playbackInfo
-                val playbackState = controller.playbackState ?: continue
+            for (prefController: MediaController in mediaSessionManager.getActiveSessions(null)) {
+                val pi = prefController.playbackInfo
+                val playbackState = prefController.playbackState ?: continue
                 if (playbackState.state != PlaybackState.STATE_PLAYING) {
                     continue
                 }
                 if (pi.playbackType == PlaybackInfo.PLAYBACK_TYPE_REMOTE) {
                     if (localController != null
-                        && localController.packageName!!.contentEquals(controller.packageName)
+                        && localController.packageName!!.contentEquals(prefController.packageName)
                     ) {
                         localController = null
                     }
-                    if (!remoteMediaSessionLists.contains(controller.packageName)) {
-                        remoteMediaSessionLists.add(controller.packageName)
+                    if (!remoteMediaSessionLists.contains(prefController.packageName)) {
+                        remoteMediaSessionLists.add(prefController.packageName)
                     }
                     continue
                 }
                 if (pi.playbackType == PlaybackInfo.PLAYBACK_TYPE_LOCAL) {
                     if (localController == null
-                        && !remoteMediaSessionLists.contains(controller.packageName)
+                        && !remoteMediaSessionLists.contains(prefController.packageName)
                     ) {
-                        localController = controller
+                        localController = prefController
                     }
                 }
             }
@@ -649,12 +629,12 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
     private fun updateMainWidgetResources(efab: ExtendedFAB?) {
         if (efab == null) return
 
-        efab.setElevation(0F)
+        efab.elevation = 0F
         setButtonActiveState(null, efab, false)
 
         val params: ViewGroup.LayoutParams = efab.layoutParams
         if (params is LayoutParams) {
-            if (efab.visibility == VISIBLE &&
+            if (efab.isVisible &&
                 (mMainWidgetsList!!.size == 1 || mMainWidgetsList!!.contains("none"))
             ) {
                 params.width = (mFabWidth * mWidgetsScale).toInt()
@@ -737,7 +717,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 if (iv != null) {
                     ringerButton = iv
                     ringerButton!!.setOnLongClickListener {
-                        mActivityLauncherUtils.launchAudioSettings()
+                        ActivityLauncherUtils.launchAudioSettings()
                         true
                     }
                 }
@@ -745,7 +725,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 if (efab != null) {
                     ringerButtonFab = efab
                     ringerButtonFab!!.setOnLongClickListener {
-                        mActivityLauncherUtils.launchAudioSettings()
+                        ActivityLauncherUtils.launchAudioSettings()
                         true
                     }
                 }
@@ -754,7 +734,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                     imageView = iv,
                     extendedFAB = efab,
                     clickListener = { toggleRingerMode() },
-                    icon = getDrawable(RING_VOLUME, SYSTEMUI_PACKAGE)
+                    icon = getDrawable(RING_VOLUME, SYSTEMUI_PACKAGE, true)
                         ?: ResourcesCompat.getDrawable(
                             modRes,
                             R.drawable.ic_ringer_normal,
@@ -812,7 +792,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 imageView = iv,
                 extendedFAB = efab,
                 clickListener = {
-                    mActivityLauncherUtils.launchTimer()
+                    ActivityLauncherUtils.launchTimer()
                     vibrate(1)
                 },
                 icon = getDrawable(ALARM_ICON, SYSTEMUI_PACKAGE),
@@ -823,7 +803,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 imageView = iv,
                 extendedFAB = efab,
                 clickListener = {
-                    mActivityLauncherUtils.launchCamera()
+                    ActivityLauncherUtils.launchCamera()
                     vibrate(1)
                 },
                 icon = getDrawable(CAMERA_ICON1, SYSTEMUI_PACKAGE)
@@ -869,7 +849,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 setUpWidgetResources(
                     imageView = iv, extendedFAB = efab,
                     clickListener = { toggleMediaPlaybackState() },
-                    icon = getDrawable(MEDIA_PLAY, SYSTEMUI_PACKAGE)
+                    icon = getDrawable(MEDIA_PLAY, SYSTEMUI_PACKAGE, true)
                         ?: ResourcesCompat.getDrawable(
                             modRes,
                             R.drawable.ic_play,
@@ -892,7 +872,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 setUpWidgetResources(
                     imageView = iv,
                     extendedFAB = efab,
-                    clickListener = { mActivityLauncherUtils.launchWeatherActivity(false) },
+                    clickListener = { ActivityLauncherUtils.launchWeatherActivity(false) },
                     icon = ResourcesCompat.getDrawable(
                         appContext!!.resources,
                         R.drawable.google_30,
@@ -906,7 +886,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 if (iv != null) {
                     hotspotButton = iv
                     hotspotButton!!.setOnLongClickListener {
-                        mActivityLauncherUtils.launchSettingsComponent("com.android.settings.TetherSettings")
+                        ActivityLauncherUtils.launchSettingsComponent("com.android.settings.TetherSettings")
                         true
                     }
                 }
@@ -914,7 +894,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 if (efab != null) {
                     hotspotButtonFab = efab
                     hotspotButtonFab!!.setOnLongClickListener {
-                        mActivityLauncherUtils.launchSettingsComponent("com.android.settings.TetherSettings")
+                        ActivityLauncherUtils.launchSettingsComponent("com.android.settings.TetherSettings")
                         true
                     }
                 }
@@ -1105,7 +1085,8 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         val isPlaying = isMediaPlaying
         val icon = getDrawable(
             if (isPlaying) MEDIA_PAUSE else MEDIA_PLAY,
-            SYSTEMUI_PACKAGE
+            SYSTEMUI_PACKAGE,
+            true
         ) ?: ResourcesCompat.getDrawable(
             modRes,
             if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play,
@@ -1153,7 +1134,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         post {
             try {
                 controlsTile.callMethod("handleClick", finalView)
-            } catch (ignored: Throwable) {
+            } catch (_: Throwable) {
                 controlsTile.callMethod(
                     "handleClick",
                     finalView.getExpandableView()
@@ -1173,7 +1154,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
             post {
                 try {
                     mWalletTile.callMethod("handleClick", finalView)
-                } catch (ignored: Throwable) {
+                } catch (_: Throwable) {
                     mWalletTile.callMethod(
                         "handleClick",
                         finalView.getExpandableView()
@@ -1181,14 +1162,14 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 }
             }
         } else {
-            mActivityLauncherUtils.launchWallet()
+            ActivityLauncherUtils.launchWallet()
         }
 
         vibrate(1)
     }
 
     private fun openCalculator() {
-        mActivityLauncherUtils.launchCalculator()
+        ActivityLauncherUtils.launchCalculator()
         vibrate(1)
     }
 
@@ -1208,7 +1189,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         post {
             try {
                 hotspotTile.callMethod("handleClick", finalView)
-            } catch (ignored: Throwable) {
+            } catch (_: Throwable) {
                 hotspotTile.callMethod(
                     "handleClick",
                     finalView.getExpandableView()
@@ -1232,7 +1213,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 // Call the method on the ConnectivityManager instance
                 val result = method.invoke(connectivityManager)
                 // Safely handle the return value
-                return if (result is Boolean) result else false
+                return result as? Boolean ?: false
             } catch (e: Exception) {
                 log(this@LockscreenWidgetsView, "isMobileDataEnabled error: " + e.message)
                 return false
@@ -1258,7 +1239,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
             view
         }
         if (!ControllersProvider.showInternetDialog(finalView)) {
-            mActivityLauncherUtils.launchApp(Intent(Settings.ACTION_WIFI_SETTINGS), false)
+            ActivityLauncherUtils.launchApp(Intent(Settings.ACTION_WIFI_SETTINGS), false)
         }
         vibrate(0)
     }
@@ -1349,8 +1330,6 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
 
         loadColors()
 
-        mActivityLauncherUtils = ActivityLauncherUtils(mContext, activityStarter)
-
         mHandler = Handler(Looper.getMainLooper())
         if (mWeatherClient == null) {
             mWeatherClient = OmniJawsClient(context)
@@ -1394,18 +1373,11 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         ThemeChangeCallback.getInstance().registerThemeChangedCallback(mThemeChangeCallback)
 
         // Add a Screen On Receiver so we can update the widgets state when the screen is turned on
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            mContext.registerReceiver(
-                mScreenOnReceiver,
-                IntentFilter(Intent.ACTION_SCREEN_ON),
-                Context.RECEIVER_EXPORTED
-            )
-        } else {
-            mContext.registerReceiver(
-                mScreenOnReceiver,
-                IntentFilter(Intent.ACTION_SCREEN_ON)
-            )
-        }
+        mContext.registerReceiver(
+            mScreenOnReceiver,
+            IntentFilter(Intent.ACTION_SCREEN_ON),
+            Context.RECEIVER_EXPORTED
+        )
     }
 
     private fun loadColors() {
@@ -1414,7 +1386,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 BuildConfig.APPLICATION_ID,
                 Context.CONTEXT_IGNORE_SECURITY
             )
-        } catch (ignored: java.lang.Exception) {
+        } catch (_: Exception) {
         }
         mDarkColor = ResourcesCompat.getColor(
             appContext!!.resources,
@@ -1471,7 +1443,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         container.addView(mMainWidgetsContainer)
 
         // Add secondary widgets container
-        mSecondaryWidgetsContainer = createSecondaryWidgetsContainer(mContext)
+        mSecondaryWidgetsContainer = createSecondaryWidgetsContainer()
         container.addView(mSecondaryWidgetsContainer)
 
         addView(container)
@@ -1565,7 +1537,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
 
         try {
             bluetoothController.callMethod("setBluetoothEnabled", !isBluetoothEnabled)
-        } catch (throwable: Throwable) {
+        } catch (_: Throwable) {
             bluetoothTile.callMethod("toggleBluetooth")
         }
 
@@ -1581,7 +1553,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
             view
         }
         if (!ControllersProvider.showBluetoothDialog(mContext, finalView)) {
-            mActivityLauncherUtils.launchBluetoothSettings()
+            ActivityLauncherUtils.launchBluetoothSettings()
         }
         vibrate(0)
     }
@@ -1604,7 +1576,7 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
             btButtonFab,
             isBluetoothOn,
             icon,
-            if (isConnected) deviceName!!
+            if (isConnected) deviceName
             else getString(BT_LABEL, SYSTEMUI_PACKAGE)
         )
     }
@@ -1657,7 +1629,8 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
     @Suppress("deprecation")
     private fun getHotspotSSID(): String {
         try {
-            val methods: Array<Method> = WifiManager::class.java.declaredMethods.toList().union(WifiManager::class.java.methods.toList()).toTypedArray()
+            val methods: Array<Method> = WifiManager::class.java.declaredMethods.toList()
+                .union(WifiManager::class.java.methods.toList()).toTypedArray()
             for (m in methods) {
                 if (m.name == "getWifiApConfiguration") {
                     val config = m.invoke(mWifiManager) as android.net.wifi.WifiConfiguration
@@ -1680,9 +1653,9 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         return false
     }
 
-    private fun getMediaControllerPlaybackState(controller: MediaController?): Int {
-        if (controller != null) {
-            val playbackState = controller.playbackState
+    private fun getMediaControllerPlaybackState(prefController: MediaController?): Int {
+        if (prefController != null) {
+            val playbackState = prefController.playbackState
             if (playbackState != null) {
                 return playbackState.state
             }
@@ -1792,10 +1765,6 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         }
     }
 
-    fun setActivityStarter(activityStarter: Any?) {
-        mActivityLauncherUtils = ActivityLauncherUtils(mContext, activityStarter)
-    }
-
     fun setDozingState(isDozing: Boolean) {
         instance?.apply {
             mDozing = isDozing
@@ -1804,15 +1773,19 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
     }
 
     @Suppress("DiscouragedApi")
-    private fun getDrawable(drawableRes: String, pkg: String): Drawable? {
-        try {
-            return ContextCompat.getDrawable(
+    private fun getDrawable(
+        drawableRes: String,
+        pkg: String,
+        suppressError: Boolean = false
+    ): Drawable? {
+        return try {
+            ContextCompat.getDrawable(
                 mContext,
                 mContext.resources.getIdentifier(drawableRes, "drawable", pkg)
             )
         } catch (t: Throwable) {
-            // We have a calculator icon, so if SystemUI doesn't just return ours
-            return when (drawableRes) {
+            when (drawableRes) {
+                // We have a calculator icon, so if SystemUI doesn't just return ours
                 CALCULATOR_ICON -> ResourcesCompat.getDrawable(
                     modRes,
                     R.drawable.ic_calculator,
@@ -1826,8 +1799,13 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                 TORCH_INACTIVE -> getDrawable(TORCH_A12, FRAMEWORK_PACKAGE)
 
                 else -> {
-                    log(this@LockscreenWidgetsView, "getDrawable $drawableRes from $pkg error $t")
-                    return null
+                    if (!suppressError) {
+                        log(
+                            this@LockscreenWidgetsView,
+                            "getDrawable $drawableRes from $pkg error $t"
+                        )
+                    }
+                    null
                 }
             }
         }
@@ -1863,7 +1841,9 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
                     AudioManager.RINGER_MODE_VIBRATE -> RING_VOLUME_VIBRATE
                     AudioManager.RINGER_MODE_SILENT -> RING_VOLUME_MUTE
                     else -> throw IllegalStateException("Unexpected value: " + mAudioManager.ringerMode)
-                }, SYSTEMUI_PACKAGE
+                },
+                SYSTEMUI_PACKAGE,
+                true
             ) ?: ResourcesCompat.getDrawable(
                 modRes,
                 when (mAudioManager.ringerMode) {
@@ -1968,9 +1948,9 @@ class LockscreenWidgetsView(private val context: Context, activityStarter: Any?)
         @Volatile
         private var instance: LockscreenWidgetsView? = null
 
-        fun getInstance(context: Context, activityStarter: Any?): LockscreenWidgetsView {
+        fun getInstance(context: Context): LockscreenWidgetsView {
             return instance ?: synchronized(this) {
-                instance ?: LockscreenWidgetsView(context, activityStarter).also { instance = it }
+                instance ?: LockscreenWidgetsView(context).also { instance = it }
             }
         }
 

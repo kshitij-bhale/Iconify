@@ -2,7 +2,8 @@ package com.drdisagree.iconify.xposed.modules.statusbar
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.ImageDecoder
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -10,21 +11,13 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import com.drdisagree.iconify.R
 import com.drdisagree.iconify.data.common.Const.SYSTEMUI_PACKAGE
-import com.drdisagree.iconify.data.common.Preferences.STATUSBAR_LOGO_CUSTOM
-import com.drdisagree.iconify.data.common.Preferences.STATUSBAR_LOGO_POSITION
-import com.drdisagree.iconify.data.common.Preferences.STATUSBAR_LOGO_SIZE
-import com.drdisagree.iconify.data.common.Preferences.STATUSBAR_LOGO_STYLE
-import com.drdisagree.iconify.data.common.Preferences.STATUSBAR_LOGO_SWITCH
-import com.drdisagree.iconify.data.common.Preferences.STATUSBAR_LOGO_TINT
-import com.drdisagree.iconify.data.common.XposedConst.STATUSBAR_LOGO_FILE
+import com.drdisagree.iconify.data.keys.XposedKey
 import com.drdisagree.iconify.xposed.HookRes.Companion.modRes
 import com.drdisagree.iconify.xposed.ModPack
 import com.drdisagree.iconify.xposed.modules.extras.callbacks.BootCallback
-import com.drdisagree.iconify.xposed.modules.extras.callbacks.HeadsUpCallback
 import com.drdisagree.iconify.xposed.modules.extras.callbacks.KeyguardShowingCallback
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.reAddView
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.toCircularDrawable
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.toPx
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.reAddView
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.toPx
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.XposedHook.Companion.findClass
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.callStaticMethod
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookMethod
@@ -43,50 +36,54 @@ class StatusbarLogo(context: Context) : ModPack(context) {
     private var logoStyle = 0
     private var logoSize = 12
     private var customLogo = false
+    private var customLogoUri = ""
     private var tintCustomLogo = false
+    private var requiresTint = false
     private var logoImageView: LogoImageView? = null
     private var logoImageViewRight: LogoImageViewRight? = null
     private var darkIconDispatcherClass: Class<*>? = null
 
     override fun updatePrefs(vararg key: String) {
         Xprefs.apply {
-            showLogo = getBoolean(STATUSBAR_LOGO_SWITCH, false)
-            logoPosition = getString(STATUSBAR_LOGO_POSITION, "0")!!.toInt()
-            logoStyle = getString(STATUSBAR_LOGO_STYLE, "0")!!.toInt()
-            logoSize = getSliderInt(STATUSBAR_LOGO_SIZE, 12)
+            showLogo = getBoolean(XposedKey.STATUSBAR_LOGO)
+            logoPosition = getString(XposedKey.STATUSBAR_LOGO_POSITION).toInt()
+            logoStyle = getString(XposedKey.STATUSBAR_LOGO_STYLE).toInt()
+            logoSize = getInt(XposedKey.STATUSBAR_LOGO_SIZE)
             customLogo = listOf<String>(
                 *modRes.getStringArray(R.array.status_bar_logo_style_entries)
             )[logoStyle] == modRes.getString(R.string.status_bar_logo_style_custom)
-            tintCustomLogo = customLogo && getBoolean(STATUSBAR_LOGO_TINT, false)
+            customLogoUri = getString(XposedKey.STATUSBAR_LOGO_FILE_URI)
+            tintCustomLogo = customLogo && getBoolean(XposedKey.STATUSBAR_LOGO_TINT)
+            requiresTint = !customLogo || tintCustomLogo
         }
 
         when (key.firstOrNull()) {
             in setOf(
-                STATUSBAR_LOGO_SWITCH,
-                STATUSBAR_LOGO_POSITION,
-                STATUSBAR_LOGO_STYLE,
-                STATUSBAR_LOGO_TINT
+                XposedKey.STATUSBAR_LOGO.name,
+                XposedKey.STATUSBAR_LOGO_POSITION.name,
+                XposedKey.STATUSBAR_LOGO_STYLE.name,
+                XposedKey.STATUSBAR_LOGO_TINT.name
             ) -> {
                 logoImageView?.updateSettings(
                     showLogo,
                     logoPosition,
                     logoStyle,
-                    tintCustomLogo
+                    requiresTint
                 )
                 logoImageViewRight?.updateSettings(
                     showLogo,
                     logoPosition,
                     logoStyle,
-                    tintCustomLogo
+                    requiresTint
                 )
             }
 
-            STATUSBAR_LOGO_CUSTOM -> {
+            XposedKey.STATUSBAR_LOGO_FILE_URI.name -> {
                 logoImageView?.loadCustomLogo()
                 logoImageViewRight?.loadCustomLogo()
             }
 
-            STATUSBAR_LOGO_SIZE -> {
+            XposedKey.STATUSBAR_LOGO_SIZE.name -> {
                 logoImageView?.updateLeftLogo()
                 logoImageViewRight?.updateRightLogo()
             }
@@ -110,7 +107,7 @@ class StatusbarLogo(context: Context) : ModPack(context) {
                         "id",
                         mContext.packageName
                     )
-                ) ?: phoneStatusBarView.findViewById<ViewGroup?>(
+                ) ?: phoneStatusBarView.findViewById(
                     mContext.resources.getIdentifier(
                         "status_bar_left_side",
                         "id",
@@ -118,9 +115,9 @@ class StatusbarLogo(context: Context) : ModPack(context) {
                     )
                 )
 
-                val systemIcons = phoneStatusBarView.findViewById<ViewGroup>(
+                val systemIconsParent = phoneStatusBarView.findViewById<ViewGroup>(
                     mContext.resources.getIdentifier(
-                        "system_icons",
+                        "status_bar_end_side_content",
                         "id",
                         mContext.packageName
                     )
@@ -128,19 +125,13 @@ class StatusbarLogo(context: Context) : ModPack(context) {
 
                 if (logoImageView == null) {
                     logoImageView = LogoImageView(mContext).apply {
-                        setupLogo(
-                            "status_bar_left_clock_starting_padding",
-                            "status_bar_left_clock_end_padding"
-                        )
+                        setupLeftLogo()
                     }
                 }
 
                 if (logoImageViewRight == null) {
                     logoImageViewRight = LogoImageViewRight(mContext).apply {
-                        setupLogo(
-                            "status_bar_clock_starting_padding",
-                            "status_bar_clock_end_padding"
-                        )
+                        setupRightLogo()
                     }
                 }
 
@@ -148,33 +139,21 @@ class StatusbarLogo(context: Context) : ModPack(context) {
                     showLogo,
                     logoPosition,
                     logoStyle,
-                    tintCustomLogo
+                    requiresTint
                 )
                 logoImageViewRight!!.updateSettings(
                     showLogo,
                     logoPosition,
                     logoStyle,
-                    tintCustomLogo
+                    requiresTint
                 )
 
                 logoImageView!!.loadCustomLogo()
                 logoImageViewRight!!.loadCustomLogo()
 
                 startSideExceptHeadsUp.reAddView(logoImageView, 1)
-                systemIcons.reAddView(logoImageViewRight)
+                systemIconsParent.reAddView(logoImageViewRight, systemIconsParent.childCount)
             }
-
-        HeadsUpCallback.getInstance().registerHeadsUpListener(
-            object : HeadsUpCallback.HeadsUpListener {
-                override fun onHeadsUpShown() {
-                    logoImageView?.alpha = 0f
-                }
-
-                override fun onHeadsUpGone() {
-                    logoImageView?.alpha = 1f
-                }
-            }
-        )
 
         KeyguardShowingCallback.getInstance().registerKeyguardShowingListener(
             object : KeyguardShowingCallback.KeyguardShowingListener {
@@ -212,12 +191,12 @@ class StatusbarLogo(context: Context) : ModPack(context) {
 
             if (!showLogo) return
 
-            if (!customLogo || tintCustomLogo) {
+            if (requiresTint) {
                 if (logoImageView.isLogoVisible) {
-                    logoImageView.updateLogo()
+                    logoImageView.updateLogo(force = false)
                 }
                 if (logoImageViewRight.isLogoVisible) {
-                    logoImageViewRight.updateLogo()
+                    logoImageViewRight.updateLogo(force = false)
                 }
             }
         }
@@ -243,30 +222,34 @@ class StatusbarLogo(context: Context) : ModPack(context) {
                 updateLogoColor(param, logoImageView!!, logoImageViewRight!!)
             }
 
-        BootCallback.registerBootListener(
-            object : BootCallback.BootListener {
-                override fun onDeviceBooted() {
-                    logoImageView?.loadCustomLogo()
-                    logoImageViewRight?.loadCustomLogo()
-                }
-            }
-        )
+        BootCallback.registerBootListener {
+            logoImageView?.loadCustomLogo()
+            logoImageViewRight?.loadCustomLogo()
+        }
     }
 
     private fun LogoImage.updateLeftLogo() {
+        setupLeftLogo()
+        updateSettings(showLogo, logoPosition, logoStyle, requiresTint)
+    }
+
+    private fun LogoImage.updateRightLogo() {
+        setupRightLogo()
+        updateSettings(showLogo, logoPosition, logoStyle, requiresTint)
+    }
+
+    private fun LogoImage.setupLeftLogo() {
         setupLogo(
             "status_bar_left_clock_starting_padding",
             "status_bar_left_clock_end_padding"
         )
-        updateSettings(showLogo, logoPosition, logoStyle, tintCustomLogo)
     }
 
-    private fun LogoImage.updateRightLogo() {
+    private fun LogoImage.setupRightLogo() {
         setupLogo(
             "status_bar_clock_starting_padding",
             "status_bar_clock_end_padding"
         )
-        updateSettings(showLogo, logoPosition, logoStyle, tintCustomLogo)
     }
 
     private fun LogoImage.setupLogo(startPaddingRes: String, endPaddingRes: String) {
@@ -298,15 +281,18 @@ class StatusbarLogo(context: Context) : ModPack(context) {
     private fun LogoImage.loadCustomLogo() {
         if (!customLogo) return
 
-        try {
-            val drawable = ImageDecoder.decodeDrawable(
-                ImageDecoder.createSource(STATUSBAR_LOGO_FILE)
-            ).toCircularDrawable(mContext)
-
-            setImageDrawable(drawable)
-        } catch (_: Throwable) {
-            @Suppress("DEPRECATION")
-            modRes.getDrawable(R.drawable.ic_android_logo)
+        if (customLogoUri.isEmpty()) {
+            setImageDrawable(
+                GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setStroke(mContext.toPx(2), Color.DKGRAY)
+                    setColor(Color.TRANSPARENT)
+                    setSize(mContext.toPx(logoSize), mContext.toPx(logoSize))
+                }
+            )
+            return
         }
+
+        updateLogo()
     }
 }

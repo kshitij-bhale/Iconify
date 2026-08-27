@@ -8,10 +8,11 @@ import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.core.graphics.drawable.toDrawable
 import com.drdisagree.iconify.data.common.Const.SYSTEMUI_PACKAGE
-import com.drdisagree.iconify.data.common.Preferences.COLORED_NOTIFICATION_ICON_SWITCH
+import com.drdisagree.iconify.data.keys.XposedKey
 import com.drdisagree.iconify.xposed.ModPack
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.XposedHook.Companion.findClass
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.callMethod
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getAnyField
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getField
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getFieldSilently
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookMethod
@@ -25,7 +26,7 @@ class AppIconInNotification(context: Context) : ModPack(context) {
 
     override fun updatePrefs(vararg key: String) {
         Xprefs.apply {
-            coloredNotificationIcon = getBoolean(COLORED_NOTIFICATION_ICON_SWITCH, false)
+            coloredNotificationIcon = getBoolean(XposedKey.COLORED_NOTIFICATION_ICON)
         }
     }
 
@@ -41,19 +42,19 @@ class AppIconInNotification(context: Context) : ModPack(context) {
                 val row = param.args[0]
                 val notifyEntries = try {
                     row.callMethod("getEntry")
-                } catch (ignored: Throwable) {
-                    row.getField("mEntry")
+                } catch (_: Throwable) {
+                    row.getAnyField("mEntry", "mEntryAdapter")
                 }
                 val notifySbn = try {
                     notifyEntries.callMethod("getSbn")
-                } catch (ignored: Throwable) {
+                } catch (_: Throwable) {
                     notifyEntries.getField("mSbn")
                 }
                 val notification = notifySbn.callMethod("getNotification") as Notification
                 val pkgName = notifySbn.callMethod("getPackageName") as? String ?: return@runAfter
                 val appIcon: Drawable = try {
                     mContext.packageManager.getApplicationIcon(pkgName)
-                } catch (ignored: Throwable) {
+                } catch (_: Throwable) {
                     return@runAfter
                 }
                 val mIcon = param.thisObject.getFieldSilently("mIcon") as ImageView
@@ -88,8 +89,10 @@ class AppIconInNotification(context: Context) : ModPack(context) {
 
                 val iconView = param.thisObject as ImageView
 
-                iconView.setPadding(0, 0, 0, 0)
-                iconView.background = Color.TRANSPARENT.toDrawable()
+                iconView.post {
+                    iconView.setPadding(0, 0, 0, 0)
+                    iconView.background = Color.TRANSPARENT.toDrawable()
+                }
             }
     }
 }

@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center">
+    android:layout_gravity="center_horizontal|top"
+    android:gravity="center_horizontal|top">
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -29,7 +30,7 @@
                 android:fontFamily="@font/general_sans"
                 android:format12Hour="hh"
                 android:tag="text1|nolineheight"
-                android:textColor="@color/colorOnPrimaryContainerLight"
+                android:textColor="@color/material_dynamic_primary10"
                 android:format24Hour="HH"
                 android:textSize="111sp"
                 android:textStyle="bold" />
@@ -42,7 +43,7 @@
                 android:fontFamily="@font/general_sans"
                 android:textSize="47sp"
                 android:tag="text1|nolineheight"
-                android:textColor="@color/colorOnTertiaryDark"
+                android:textColor="@color/material_dynamic_tertiary20"
                 android:textStyle="bold"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="23dp"/>
@@ -66,7 +67,7 @@
                 android:gravity="center"
                 android:tag="text1|nolineheight"
                 android:textAllCaps="true"
-                android:textColor="@color/colorOnSecondaryContainerDark"
+                android:textColor="@color/material_dynamic_secondary10"
                 android:textSize="15sp" />
 
         </LinearLayout>
@@ -88,7 +89,7 @@
                 android:gravity="center"
                 android:tag="text1|nolineheight"
                 android:textAllCaps="true"
-                android:textColor="@color/colorOnSecondaryContainerDark"
+                android:textColor="@color/material_dynamic_secondary10"
                 android:textSize="20sp" />
 
         </LinearLayout>

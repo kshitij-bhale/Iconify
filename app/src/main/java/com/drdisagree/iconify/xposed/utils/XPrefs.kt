@@ -4,10 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.os.Handler
+import android.os.Looper
 import com.crossbowffs.remotepreferences.RemotePreferences
 import com.drdisagree.iconify.BuildConfig
 import com.drdisagree.iconify.data.common.Const.PREF_UPDATE_EXCLUSIONS
-import com.drdisagree.iconify.data.common.Resources.SHARED_XPREFERENCES
 import com.drdisagree.iconify.xposed.HookEntry
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.log
 
@@ -26,10 +27,22 @@ object XPrefs {
         Xprefs = ExtendedRemotePreferences(
             context,
             BuildConfig.APPLICATION_ID,
-            SHARED_XPREFERENCES,
+            "${BuildConfig.APPLICATION_ID}.preferences",
             true
         )
         (Xprefs as RemotePreferences).registerOnSharedPreferenceChangeListener(listener)
+
+        Xprefs.addRecoveryListener {
+            Handler(Looper.getMainLooper()).post {
+                HookEntry.runningMods.forEach { thisMod ->
+                    try {
+                        thisMod.updatePrefs()
+                    } catch (throwable: Throwable) {
+                        log(this@XPrefs, "${thisMod.javaClass.simpleName} -> " + throwable)
+                    }
+                }
+            }
+        }
     }
 
     private fun loadEverything(vararg key: String?) {

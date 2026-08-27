@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 
 object BootCallback {
 
-    interface BootListener {
+    fun interface BootListener {
         fun onDeviceBooted()
     }
 
@@ -15,7 +15,7 @@ object BootCallback {
         try {
             Executors.newSingleThreadScheduledExecutor().apply {
                 scheduleWithFixedDelay({
-                    if (File(Environment.getExternalStorageDirectory(), "Android").isDirectory()) {
+                    if (File(Environment.getExternalStorageDirectory(), "Android").isDirectory) {
                         listener.onDeviceBooted()
                         shutdown()
                         shutdownNow()

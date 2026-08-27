@@ -1,6 +1,6 @@
 package com.drdisagree.iconify.xposed.modules.statusbar
 
-import android.R
+import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.StateListAnimator
@@ -26,34 +26,35 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import com.drdisagree.iconify.data.common.Const.SYSTEMUI_PACKAGE
-import com.drdisagree.iconify.data.common.Preferences.CHIP_STATUSBAR_CLOCK_CLICKABLE_SWITCH
-import com.drdisagree.iconify.data.common.Preferences.DUAL_STATUSBAR
-import com.drdisagree.iconify.data.common.Preferences.HIDE_LOCKSCREEN_CARRIER
-import com.drdisagree.iconify.data.common.Preferences.HIDE_LOCKSCREEN_STATUSBAR
 import com.drdisagree.iconify.data.common.Preferences.ICONIFY_SB_CENTER_CLOCK_CONTAINER_TAG
-import com.drdisagree.iconify.data.common.Preferences.NOTIFICATION_ICONS_LIMIT
-import com.drdisagree.iconify.data.common.Preferences.SB_CLOCK_SIZE
-import com.drdisagree.iconify.data.common.Preferences.SB_CLOCK_SIZE_SWITCH
-import com.drdisagree.iconify.data.common.Preferences.SHOW_4G_INSTEAD_OF_LTE
-import com.drdisagree.iconify.data.common.Preferences.STATUSBAR_CLOCK_POSITION
+import com.drdisagree.iconify.data.keys.XposedKey
 import com.drdisagree.iconify.xposed.HookRes.Companion.resParams
 import com.drdisagree.iconify.xposed.ModPack
-import com.drdisagree.iconify.xposed.modules.BackgroundChip
-import com.drdisagree.iconify.xposed.modules.extras.utils.StatusBarClock.getCenterClockView
-import com.drdisagree.iconify.xposed.modules.extras.utils.StatusBarClock.getLeftClockView
-import com.drdisagree.iconify.xposed.modules.extras.utils.StatusBarClock.getRightClockView
-import com.drdisagree.iconify.xposed.modules.extras.utils.StatusBarClock.setClockGravity
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.reAddView
-import com.drdisagree.iconify.xposed.modules.extras.utils.ViewHelper.toPx
+import com.drdisagree.iconify.xposed.modules.extras.GraphicsColorKt
+import com.drdisagree.iconify.xposed.modules.extras.SettingsLibUtils
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.StatusBarClock.getCenterClockView
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.StatusBarClock.getLeftClockView
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.StatusBarClock.getRightClockView
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.StatusBarClock.setClockGravity
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.reAddView
+import com.drdisagree.iconify.xposed.modules.extras.utils.misc.ViewHelper.toPx
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.ResourceHookManager
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.XposedHook.Companion.findClass
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.callMethod
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.callStaticMethod
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getField
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.getFieldSilently
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookConstructor
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookLayout
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookMethod
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.log
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.setField
+import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.setStaticField
 import com.drdisagree.iconify.xposed.modules.extras.views.AlphaOptimizedLinearLayout
 import com.drdisagree.iconify.xposed.utils.XPrefs.Xprefs
+import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import kotlin.math.roundToInt
 
 @SuppressLint("DiscouragedApi")
 class StatusbarMisc(context: Context) : ModPack(context) {
@@ -72,30 +73,36 @@ class StatusbarMisc(context: Context) : ModPack(context) {
     private var show4GInsteadOfLTE = false
     private var notifIconsLimit = -1
     private var dualStatusbarEnabled = false
+    private var linkToCustomColor = false
+    private var darkIconDispatcherImplInstance: Any? = null
 
     override fun updatePrefs(vararg key: String) {
         Xprefs.apply {
-            sbClockSizeSwitch = getBoolean(SB_CLOCK_SIZE_SWITCH, false)
-            sbClockSize = getSliderInt(SB_CLOCK_SIZE, 14)
-            hideLockscreenCarrier = getBoolean(HIDE_LOCKSCREEN_CARRIER, false)
-            hideLockscreenStatusbar = getBoolean(HIDE_LOCKSCREEN_STATUSBAR, false)
-            clockPosition = getString(STATUSBAR_CLOCK_POSITION, "0")!!.toInt()
-            show4GInsteadOfLTE = getBoolean(SHOW_4G_INSTEAD_OF_LTE, false)
-            notifIconsLimit = getSliderInt(NOTIFICATION_ICONS_LIMIT, -1)
-            dualStatusbarEnabled = getBoolean(DUAL_STATUSBAR, false)
-            mClockClickable = getBoolean(CHIP_STATUSBAR_CLOCK_CLICKABLE_SWITCH, false)
+            sbClockSizeSwitch = getBoolean(XposedKey.STATUSBAR_CLOCK_TEXT_SIZE_SWITCH)
+            sbClockSize = getInt(XposedKey.STATUSBAR_CLOCK_TEXT_SIZE)
+            hideLockscreenCarrier = getBoolean(XposedKey.HIDE_LOCKSCREEN_CARRIER)
+            hideLockscreenStatusbar = getBoolean(XposedKey.HIDE_LOCKSCREEN_STATUSBAR)
+            clockPosition = getString(XposedKey.STATUSBAR_CLOCK_POSITION).toInt()
+            show4GInsteadOfLTE = getBoolean(XposedKey.SHOW_4G_INSTEAD_OF_LTE)
+            notifIconsLimit = getInt(XposedKey.NOTIFICATION_ICONS_LIMIT)
+            dualStatusbarEnabled = getBoolean(XposedKey.DUAL_STATUSBAR)
+            mClockClickable = getBoolean(XposedKey.STATUSBAR_CLOCK_CLICKABLE)
+            linkToCustomColor = getBoolean(XposedKey.STATUSBAR_LINK_TO_CUSTOM_COLOR)
         }
 
         when (key.firstOrNull()) {
             in setOf(
-                SB_CLOCK_SIZE_SWITCH,
-                SB_CLOCK_SIZE
+                XposedKey.STATUSBAR_CLOCK_TEXT_SIZE_SWITCH.name,
+                XposedKey.STATUSBAR_CLOCK_TEXT_SIZE.name
             ) -> setClockSize()
 
             in setOf(
-                HIDE_LOCKSCREEN_CARRIER,
-                HIDE_LOCKSCREEN_STATUSBAR
+                XposedKey.HIDE_LOCKSCREEN_CARRIER.name,
+                XposedKey.HIDE_LOCKSCREEN_STATUSBAR.name
             ) -> hideLockscreenCarrierOrStatusbar()
+
+            XposedKey.STATUSBAR_LINK_TO_CUSTOM_COLOR.name,
+            XposedKey.STATUSBAR_CUSTOM_COLOR_CHANGED.name -> applyIconTint()
         }
     }
 
@@ -106,6 +113,7 @@ class StatusbarMisc(context: Context) : ModPack(context) {
         show4GInsteadOfLTE()
         notificationIconsLimit()
         clickableClockView()
+        setStatusbarColor()
     }
 
     private fun hideLockscreenCarrierOrStatusbar() {
@@ -169,6 +177,49 @@ class StatusbarMisc(context: Context) : ModPack(context) {
     }
 
     private fun applyClockSize() {
+        val textChangeListener = object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(
+                s: CharSequence,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+            }
+
+            override fun afterTextChanged(s: Editable) {
+                setClockSize()
+            }
+        }
+
+        fun addClockTextListener() {
+            mClockView?.addTextChangedListener(textChangeListener)
+            mCenterClockView?.addTextChangedListener(textChangeListener)
+            mRightClockView?.addTextChangedListener(textChangeListener)
+        }
+
+        fun removeClockTextListener() {
+            mClockView?.removeTextChangedListener(textChangeListener)
+            mCenterClockView?.removeTextChangedListener(textChangeListener)
+            mRightClockView?.removeTextChangedListener(textChangeListener)
+        }
+
+        fun updateClockTextSize() {
+            mLeftClockSize = mClockView?.textSize?.toInt() ?: 14
+            mCenterClockSize = mCenterClockView?.textSize?.toInt() ?: 14
+            mRightClockSize = mRightClockView?.textSize?.toInt() ?: 14
+
+            setClockSize()
+            addClockTextListener()
+        }
+
         val collapsedStatusBarFragment = findClass(
             "$SYSTEMUI_PACKAGE.statusbar.phone.CollapsedStatusBarFragment",
             "$SYSTEMUI_PACKAGE.statusbar.phone.fragment.CollapsedStatusBarFragment"
@@ -185,38 +236,27 @@ class StatusbarMisc(context: Context) : ModPack(context) {
                 mCenterClockView = getCenterClockView(mContext, param) as? TextView
                 mRightClockView = getRightClockView(mContext, param) as? TextView
 
-                mLeftClockSize = mClockView?.textSize?.toInt() ?: 14
-                mCenterClockSize = mCenterClockView?.textSize?.toInt() ?: 14
-                mRightClockSize = mRightClockView?.textSize?.toInt() ?: 14
-
-                setClockSize()
-
-                val textChangeListener = object : TextWatcher {
-                    override fun beforeTextChanged(
-                        s: CharSequence,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                    }
-
-                    override fun afterTextChanged(s: Editable) {
-                        setClockSize()
-                    }
-                }
-
-                mClockView?.addTextChangedListener(textChangeListener)
-                mCenterClockView?.addTextChangedListener(textChangeListener)
-                mRightClockView?.addTextChangedListener(textChangeListener)
+                updateClockTextSize()
             }
+
+        val phoneStatusBarViewControllerClass = findClass(
+            "com.android.systemui.statusbar.phone.PhoneStatusBarViewController",
+            suppressError = true
+        )
+
+        phoneStatusBarViewControllerClass
+            .hookMethod("onViewAttached")
+            .runAfter { param ->
+                mClockView = param.thisObject.getField("clock") as TextView
+                mCenterClockView = param.thisObject.getFieldSilently("clockCenter") as? TextView
+                mRightClockView = param.thisObject.getFieldSilently("clockRight") as? TextView
+
+                updateClockTextSize()
+            }
+
+        phoneStatusBarViewControllerClass
+            .hookMethod("onViewDetached")
+            .runBefore { removeClockTextListener() }
     }
 
     @SuppressLint("RtlHardcoded")
@@ -358,7 +398,7 @@ class StatusbarMisc(context: Context) : ModPack(context) {
 
     private fun show4GInsteadOfLTE() {
         val mobileMappingsConfigClass =
-            findClass("com.android.settingslib.mobile.MobileMappings\$Config")
+            findClass($$"com.android.settingslib.mobile.MobileMappings$Config")
 
         mobileMappingsConfigClass
             .hookMethod("readConfig")
@@ -378,21 +418,17 @@ class StatusbarMisc(context: Context) : ModPack(context) {
     }
 
     private fun clickableClockView() {
-        val collapsedStatusBarFragment = findClass(
-            "$SYSTEMUI_PACKAGE.statusbar.phone.CollapsedStatusBarFragment",
-            "$SYSTEMUI_PACKAGE.statusbar.phone.fragment.CollapsedStatusBarFragment"
+        val phoneStatusBarViewControllerClass = findClass(
+            "com.android.systemui.statusbar.phone.PhoneStatusBarViewController",
+            suppressError = true
         )
 
-        collapsedStatusBarFragment
-            .hookMethod("onViewCreated")
-            .parameters(
-                View::class.java,
-                Bundle::class.java
-            )
+        phoneStatusBarViewControllerClass
+            .hookMethod("onViewAttached")
             .runAfter { param ->
-                mClockView = getLeftClockView(mContext, param) as? TextView
-                mCenterClockView = getCenterClockView(mContext, param) as? TextView
-                mRightClockView = getRightClockView(mContext, param) as? TextView
+                mClockView = param.thisObject.getField("clock") as TextView
+                mCenterClockView = param.thisObject.getFieldSilently("clockCenter") as? TextView
+                mRightClockView = param.thisObject.getFieldSilently("clockRight") as? TextView
 
                 listOf(
                     mClockView,
@@ -401,7 +437,7 @@ class StatusbarMisc(context: Context) : ModPack(context) {
                 ).forEach { clockView ->
                     if (mClockClickable && clockView != null) {
                         // Add click animation for Clock Chip
-                        setClockChipClickable(mContext, clockView, BackgroundChip.cornerRadii)
+                        setClockChipClickable(mContext, clockView, ClockChip.cornerRadii)
 
                         clockView.setOnClickListener {
                             try {
@@ -447,6 +483,136 @@ class StatusbarMisc(context: Context) : ModPack(context) {
                     }
                 }
             }
+    }
+
+    private fun setStatusbarColor() {
+        val darkIconDispatcherImplClass =
+            findClass("$SYSTEMUI_PACKAGE.statusbar.phone.DarkIconDispatcherImpl")
+
+        fun updateStatusbarColor(param: XC_MethodHook.MethodHookParam) {
+            if (!linkToCustomColor) return
+
+            val (statusbarColorLight, statusbarColorDark) = getStatusbarColors(mContext)
+
+            param.thisObject.apply {
+                setField("mLightModeIconColorSingleTone", statusbarColorLight)
+                setField("mDarkModeIconColorSingleTone", statusbarColorDark)
+                setField("mLightModeContrastColor", statusbarColorLight)
+                setField("mDarkModeContrastColor", statusbarColorDark)
+            }
+        }
+
+        darkIconDispatcherImplClass
+            .hookConstructor()
+            .runAfter { param ->
+                darkIconDispatcherImplInstance = param.thisObject
+                updateStatusbarColor(param)
+            }
+
+        darkIconDispatcherImplClass
+            .hookMethod(
+                "addDarkReceiver",
+                "applyDark",
+                "applyDarkIntensity",
+                "applyIconTint"
+            )
+            .runBefore { param ->
+                darkIconDispatcherImplInstance = param.thisObject
+                updateStatusbarColor(param)
+            }
+
+        updateBatteryColors()
+        applyIconTint()
+    }
+
+    private fun applyIconTint() {
+        if (darkIconDispatcherImplInstance == null) return
+
+        val (statusbarColorLight, statusbarColorDark) = getStatusbarColors(mContext)
+
+        val mDarkIntensity = darkIconDispatcherImplInstance.getField("mDarkIntensity") as Float
+        val argbEvaluator = ArgbEvaluator::class.java.callStaticMethod("getInstance")
+
+        val mIconTint = argbEvaluator.callMethod(
+            "evaluate",
+            mDarkIntensity,
+            statusbarColorLight,
+            statusbarColorDark
+        ).callMethod("intValue")
+        val mContrastTint = argbEvaluator.callMethod(
+            "evaluate",
+            mDarkIntensity,
+            statusbarColorLight,
+            statusbarColorDark
+        ).callMethod("intValue")
+
+        darkIconDispatcherImplInstance.apply {
+            setField("mIconTint", mIconTint)
+            setField("mContrastTint", mContrastTint)
+            callMethod("applyIconTint")
+        }
+    }
+
+    private fun updateBatteryColors() {
+        if (!linkToCustomColor) return
+
+        val (statusbarColorLight, statusbarColorDark) = getStatusbarColors(mContext)
+
+        val batteryLightThemeClass =
+            findClass($$"$$SYSTEMUI_PACKAGE.statusbar.pipeline.battery.shared.ui.BatteryColors$LightTheme")
+        val batteryDarkThemeClass =
+            findClass($$"$$SYSTEMUI_PACKAGE.statusbar.pipeline.battery.shared.ui.BatteryColors$DarkTheme")
+
+        batteryLightThemeClass.setStaticField(
+            "lowAlphaBg",
+            GraphicsColorKt.colorOf(
+                ColorUtils.setAlphaComponent(
+                    statusbarColorLight,
+                    (255 * 0.20f).roundToInt()
+                )
+            )
+        )
+        batteryLightThemeClass.setStaticField(
+            "highAlphaBg",
+            GraphicsColorKt.colorOf(
+                ColorUtils.setAlphaComponent(
+                    statusbarColorLight,
+                    (255 * 0.55f).roundToInt()
+                )
+            )
+        )
+        batteryDarkThemeClass.setStaticField(
+            "lowAlphaBg",
+            GraphicsColorKt.colorOf(
+                ColorUtils.setAlphaComponent(
+                    statusbarColorLight,
+                    (255 * 0.45f).roundToInt()
+                )
+            )
+        )
+        batteryDarkThemeClass.setStaticField(
+            "highAlphaBg",
+            GraphicsColorKt.colorOf(
+                ColorUtils.setAlphaComponent(
+                    statusbarColorLight,
+                    (255 * 0.55f).roundToInt()
+                )
+            )
+        )
+
+        val batteryLightThemeDefaultClass =
+            findClass($$"$$SYSTEMUI_PACKAGE.statusbar.pipeline.battery.shared.ui.BatteryColors$LightTheme$Default")
+        val batteryDarkThemeDefaultClass =
+            findClass($$"$$SYSTEMUI_PACKAGE.statusbar.pipeline.battery.shared.ui.BatteryColors$DarkTheme$Default")
+
+        batteryLightThemeDefaultClass.setStaticField(
+            "fill",
+            GraphicsColorKt.colorOf(statusbarColorLight)
+        )
+        batteryDarkThemeDefaultClass.setStaticField(
+            "fill",
+            GraphicsColorKt.colorOf(statusbarColorDark)
+        )
     }
 
     companion object {
@@ -509,17 +675,38 @@ class StatusbarMisc(context: Context) : ModPack(context) {
 
                 // Add the animations to the StateListAnimator
                 stateListAnimator.addState(
-                    intArrayOf(R.attr.state_pressed),
+                    intArrayOf(android.R.attr.state_pressed),
                     pressedAnim
                 )
                 stateListAnimator.addState(
-                    intArrayOf(R.attr.state_focused),
+                    intArrayOf(android.R.attr.state_focused),
                     pressedAnim
                 )
                 stateListAnimator.addState(intArrayOf(), defaultAnim)
 
                 clockView.stateListAnimator = stateListAnimator
             }
+        }
+
+        fun getStatusbarColors(context: Context): Pair<Int, Int> {
+            val statusbarColorLight = SettingsLibUtils.getColorStateListDefaultColor(
+                context,
+                context.resources.getIdentifier(
+                    "light_mode_icon_color_single_tone",
+                    "color",
+                    SYSTEMUI_PACKAGE
+                )
+            )
+            val statusbarColorDark = SettingsLibUtils.getColorStateListDefaultColor(
+                context,
+                context.resources.getIdentifier(
+                    "dark_mode_icon_color_single_tone",
+                    "color",
+                    SYSTEMUI_PACKAGE
+                )
+            )
+
+            return Pair(statusbarColorLight, statusbarColorDark)
         }
     }
 }

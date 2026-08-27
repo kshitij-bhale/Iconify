@@ -5,13 +5,17 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.RemoteException
+import android.os.SystemClock
 import android.os.UserManager
 import com.drdisagree.iconify.BuildConfig
-import com.drdisagree.iconify.IRootProviderProxy
 import com.drdisagree.iconify.R
 import com.drdisagree.iconify.data.common.Const.FRAMEWORK_PACKAGE
+import com.drdisagree.iconify.services.providers.IRootProviderProxy
+import com.drdisagree.iconify.services.providers.RootProviderProxy
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.ResourceHookManager
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.XposedHook.Companion.findClass
 import com.drdisagree.iconify.xposed.modules.extras.utils.toolkit.hookMethod
@@ -32,6 +36,8 @@ import java.lang.reflect.InvocationTargetException
 import java.util.LinkedList
 import java.util.Queue
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.milliseconds
 
 class HookEntry : ServiceConnection {
 
@@ -44,7 +50,7 @@ class HookEntry : ServiceConnection {
     fun handleLoadPackage(loadPackageParam: LoadPackageParam) {
         isChildProcess = try {
             loadPackageParam.processName.contains(":")
-        } catch (ignored: Throwable) {
+        } catch (_: Throwable) {
             false
         }
 
@@ -77,40 +83,33 @@ class HookEntry : ServiceConnection {
             }
 
             else -> {
-                if (!isChildProcess) {
-                    Instrumentation::class.java
-                        .hookMethod("newApplication")
-                        .parameters(
-                            ClassLoader::class.java,
-                            String::class.java,
-                            Context::class.java
-                        )
-                        .runAfter { param ->
-                            try {
-                                if (!::mContext.isInitialized) {
-                                    mContext = param.args[2] as Context
+                Instrumentation::class.java
+                    .hookMethod("newApplication")
+                    .runAfter { param ->
+                        try {
+                            if (!::mContext.isInitialized) {
+                                mContext = param.args[param.args.size - 1] as Context
 
-                                    HookRes.modRes = mContext.createPackageContext(
-                                        BuildConfig.APPLICATION_ID,
-                                        Context.CONTEXT_IGNORE_SECURITY
-                                    ).resources
+                                HookRes.modRes = mContext.createPackageContext(
+                                    BuildConfig.APPLICATION_ID,
+                                    Context.CONTEXT_IGNORE_SECURITY
+                                ).resources
 
-                                    XPrefs.init(mContext)
-                                    ResourceHookManager.init(mContext)
+                                XPrefs.init(mContext)
+                                ResourceHookManager.init(mContext)
 
-                                    waitForXprefsLoad(loadPackageParam)
-                                }
-                            } catch (throwable: Throwable) {
-                                log(this@HookEntry, throwable)
+                                waitForXprefsLoad(loadPackageParam)
                             }
+                        } catch (throwable: Throwable) {
+                            log(this@HookEntry, throwable)
                         }
-                }
+                    }
             }
         }
     }
 
     private fun onXPrefsReady(loadPackageParam: LoadPackageParam) {
-        if (!isChildProcess && BootLoopProtector.isBootLooped(loadPackageParam.packageName)) {
+        if (BootLoopProtector.isBootLooped(loadPackageParam.packageName)) {
             log("Possible crash in ${loadPackageParam.packageName} ; Iconify will not load for now...")
             return
         }
@@ -155,15 +154,35 @@ class HookEntry : ServiceConnection {
     }
 
     private fun waitForXprefsLoad(loadPackageParam: LoadPackageParam) {
-        while (true) {
-            try {
-                Xprefs.getBoolean("LoadTestBooleanValue", false)
-                break
-            } catch (ignored: Throwable) {
-                SystemUtils.sleep(1000);
+        val deadline = SystemClock.uptimeMillis() + MAX_PREFS_WAIT_MS
+
+        while (SystemClock.uptimeMillis() < deadline) {
+            if (Xprefs.isProviderReady()) {
+                onPrefsAvailable(loadPackageParam)
+                return
+            }
+            SystemUtils.sleep(1000)
+        }
+
+        log(
+            "Prefs provider not responding after ${MAX_PREFS_WAIT_MS / 1000}s; " +
+                    "continuing ${loadPackageParam.packageName} startup without Iconify " +
+                    "and waiting for the provider in background"
+        )
+
+        val loaded = AtomicBoolean(false)
+        Xprefs.addRecoveryListener {
+            if (loaded.compareAndSet(false, true)) {
+                Handler(Looper.getMainLooper()).post { onPrefsAvailable(loadPackageParam) }
             }
         }
 
+        if (Xprefs.isProviderReady() && loaded.compareAndSet(false, true)) {
+            onPrefsAvailable(loadPackageParam)
+        }
+    }
+
+    private fun onPrefsAvailable(loadPackageParam: LoadPackageParam) {
         log("Iconify Version: ${BuildConfig.VERSION_NAME}")
         log("Hooked ${loadPackageParam.packageName}")
 
@@ -177,14 +196,14 @@ class HookEntry : ServiceConnection {
             withContext(Dispatchers.IO) {
                 while (mUserManager == null || !mUserManager.isUserUnlocked) {
                     // device is still CE encrypted
-                    delay(2000)
+                    delay(2000.milliseconds)
                 }
 
-                delay(5000) // wait for the unlocked account to settle down a bit
+                delay(5000.milliseconds) // wait for the unlocked account to settle down a bit
 
                 while (rootProxyIPC == null) {
                     connectRootService()
-                    delay(5000)
+                    delay(5000.milliseconds)
                 }
             }
         }
@@ -195,11 +214,7 @@ class HookEntry : ServiceConnection {
             val intent = Intent().apply {
                 component = ComponentName(
                     BuildConfig.APPLICATION_ID,
-                    "${
-                        BuildConfig.APPLICATION_ID
-                            .replace(".debug", "")
-                            .replace(".foss", "")
-                    }.services.RootProviderProxy"
+                    RootProviderProxy::class.qualifiedName!!
                 )
             }
 
@@ -220,7 +235,7 @@ class HookEntry : ServiceConnection {
             while (!proxyQueue.isEmpty()) {
                 try {
                     proxyQueue.poll()!!.run(rootProxyIPC!!)
-                } catch (ignored: Throwable) {
+                } catch (_: Throwable) {
                 }
             }
         }
@@ -244,6 +259,8 @@ class HookEntry : ServiceConnection {
                 _instance = value?.let { WeakReference(it) }
             }
 
+        private const val MAX_PREFS_WAIT_MS = 30_000L
+
         val runningMods = ArrayList<ModPack>()
         var isChildProcess = false
 
@@ -254,7 +271,7 @@ class HookEntry : ServiceConnection {
             rootProxyIPC?.let {
                 try {
                     runnable.run(it)
-                } catch (ignored: RemoteException) {
+                } catch (_: RemoteException) {
                 }
             } ?: run {
                 synchronized(proxyQueue) {

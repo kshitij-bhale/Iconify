@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_moto">自定义无趣的 Android UI</string>
+    <string name="app_motto">自定义无趣的 Android UI</string>
     <!-- Onboarding -->
-    <string name="init_module_installation">初始化安装</string>
+    <string name="init_module_installation">初始化配置</string>
     <string name="step">步骤</string>
     <string name="step_number">步骤 %1$d/%2$d</string>
     <string name="module_installation_step1">创建模块外壳</string>
@@ -20,17 +20,36 @@
     <string name="onboarding_title_3">我们现在开始吗？</string>
     <string name="onboarding_subtitle_3">现在是让 Iconify 做一些内部工作的时候了。</string>
     <string name="onboarding_desc_3">开始内部任务，标志着基本工作的启动。准备好开始了吗？</string>
+    <string name="grant_permission">请授予权限</string>
     <string name="need_storage_perm_title">需要存储权限</string>
     <string name="need_storage_perm_desc">构建必要的文件需要存储权限。</string>
+    <string name="notification_perm_title">请授予通知权限</string>
+    <string name="notification_perm_desc">需要通知您可用更新的信息并显示测试
+通知。</string>
+    <string name="optional_permission">这些权限是可选的！</string>
     <string name="compatible_root_not_found_title">无法找到兼容的 Root 方法</string>
     <string name="compatible_root_not_found_desc">使用任何流行的 root 解决方案进行操作。</string>
     <string name="root_not_found_title">Root不可访问</string>
     <string name="root_not_found_desc">看来你的设备没有被ROOT！</string>
+    <string name="metamodule_not_found_title">未安装元模块</string>
+    <string name="metamodule_not_found_desc">KernelSU 3.0.0 及更高版本需要元模块以挂载并修改system分区。</string>
     <string name="need_reboot_title">需要重启设备</string>
     <string name="need_reboot_desc">重启设备以使所有文件生效。</string>
     <string name="installation_failed_title">哎呀，出意外了</string>
     <string name="installation_failed_desc">日志已被保存在 Documents 文件夹中。</string>
     <string name="logs">日志</string>
+    <!-- Disclaimer -->
+    <string name="disclaimer">免责声明</string>
+    <string name="disclaimer_1_title">Root 权限&amp; Root 环境</string>
+    <string name="disclaimer_1_description">Iconify需要通过 Magisk、KernelSU 或 APatch 获得 Root 权限以修改系统资源。\n虽然 LSPosed 是可选的，但强烈推荐使用 LSPosed 以获得最佳兼容性和高级功能支持。\nIconify将请求超级用户权限；如果没有此权限，Iconify将无法对您的系统进行任何更改。</string>
+    <string name="disclaimer_2_title">对系统的覆盖&amp;修改</string>
+    <string name="disclaimer_2_description">Iconify 的工作原理是直接在系统中生成并注入动态 Runtime Resource Overlays (RRO)。\n这些修改是为基于 AOSP 的 ROM 设计的，可能会与深度定制的 OEM 界面（如 HyperOS、Realme UI 或 OneUI）发生冲突。\n根据您的 Android 版本，修改某些系统数值可能会导致系统界面冻结或出现“系统界面已停止”错误。</string>
+    <string name="disclaimer_3_title">无限重启&amp;进入 Recovery 模式的风险</string>
+    <string name="disclaimer_3_description">修改系统文件本身就存在导致设备无限重启而无法启动的风险。\n操作前，请务必确保已安装第三方Recovery（如 TWRP、OrangeFox）。\n请务必了解你的设备进入“安全模式”所需的硬件按键组合，以便在紧急情况下禁用所有模块。</string>
+    <string name="disclaimer_4_title">无担保&amp;责任</string>
+    <string name="disclaimer_4_description">本软件根据 GPL-3.0 许可证“按原样”提供，不附带任何明示或暗示的担保。\n对于因使用本软件导致的硬件损坏、SD 卡损坏或意外的“黑屏”等问题，开发者不承担任何法律或经济责任。\n使用本应用即表示您确认，您是在自愿修改设备的核心软件，相关风险由您自行承担。</string>
+    <string name="disclaimer_5_title">数据安全&amp;责任声明</string>
+    <string name="disclaimer_5_description">备份是必须的：在进行深度系统主题化之前，请始终在此设备以外的地方进行照片、联系人和文件的备份。\n您有责任通过查看官方 GitHub 文档或社区群组来验证与您的 ROM 与Iconify的兼容性。\n如果您不确定如何通过 ADB 手动移除 Magisk 模块，请不要进行高级修改。</string>
     <!-- Search Preference -->
     <string name="search_title">搜索</string>
     <string name="searchpreference_search">搜索…</string>
@@ -39,6 +58,7 @@
     <string name="searchpreference_more">更多</string>
     <string name="searchpreference_clear_history">清除历史记录</string>
     <string name="searchpreference_no_result">无结果</string>
+    <string name="recent_searches">历史搜索</string>
     <!-- Home -->
     <string name="activity_title_home_page">Iconify</string>
     <string name="activity_title_icon_pack">图标包</string>
@@ -98,6 +118,7 @@
     <!-- Settings -->
     <string name="settings_section_title_general">通用</string>
     <string name="settings_app_language">语言</string>
+    <string name="settings_app_language_desc">选择你的应用语言</string>
     <string name="settings_app_icon">App 图标</string>
     <string name="settings_app_icon_default">默认图标</string>
     <string name="settings_app_icon_themed">带主题的图标</string>
@@ -112,7 +133,7 @@
     <string name="settings_auto_update_title">自动更新</string>
     <string name="settings_auto_update_desc">在后台检查新版本。</string>
     <string name="settings_auto_update_title_wifi_only">仅通过 WiFi 进行检查</string>
-    <string name="settings_auto_update_desc_wifi_only">只能通过无线网络检查更新。</string>
+    <string name="settings_auto_update_desc_wifi_only">仅当连接到 wifi 时才检查后台更新</string>
     <string name="settings_section_title_xposed">Xposed</string>
     <string name="settings_show_warning_title">显示警告</string>
     <string name="settings_show_warning_desc">在 Xposed 菜单中显示关于如何重新优化模块的警告</string>
@@ -220,7 +241,7 @@
     <string name="icon_mask_style_scroll">滚动</string>
     <string name="icon_mask_style_square">方形</string>
     <string name="icon_mask_style_teardrop">眼泪</string>
-    <string name="icon_mask_style_rounded_rectangle">圆角\n方形</string>
+    <string name="icon_mask_style_rounded_rectangle">圆角矩形</string>
     <string name="icon_mask_style_ios">iOS</string>
     <string name="icon_mask_style_cloudy">多云</string>
     <string name="icon_mask_style_cylinder">圆柱体</string>
@@ -228,10 +249,10 @@
     <string name="icon_mask_style_heart">心</string>
     <string name="icon_mask_style_leaf">叶</string>
     <string name="icon_mask_style_stretched">流体</string>
-    <string name="icon_mask_style_tapered_rectangle">锥形\n矩形</string>
+    <string name="icon_mask_style_tapered_rectangle">锥角矩形</string>
     <string name="icon_mask_style_vessel">船</string>
     <string name="icon_mask_style_rice_rohie_meow">罗西喵</string>
-    <string name="icon_mask_style_force_round">强制圆形</string>
+    <string name="icon_mask_style_round">圆形</string>
     <!-- Color Engine -->
     <string name="activity_title_basic_colors">基础颜色</string>
     <string name="activity_desc_basic_colors">改变主色和副色</string>
@@ -327,11 +348,19 @@
     <string name="qs_panel_top_margin_info">旋转设备以查看变化；如果不起作用，请重新启动SystemUI。</string>
     <!-- Statusbar -->
     <string name="section_title_spacing">间距</string>
-    <string name="sb_left_padding">左内边距</string>
-    <string name="sb_right_padding">右内边距</string>
+    <string name="sb_start_padding">起始边距</string>
+    <string name="sb_end_padding">尾部边距</string>
     <string name="sb_height">高度</string>
+    <string name="section_title_icon_sizes">图标大小</string>
+    <string name="sb_signal_icon_size_title">放大信号图标</string>
+    <string name="sb_signal_icon_size_desc">增大自定义图标包的信号图标大小</string>
+    <string name="sb_wifi_icon_size_title">放大 WiFi 图标</string>
+    <string name="sb_wifi_icon_size_desc">增大自定义图标包的 WiFi 图标大小</string>
+    <string name="sb_network_type_size_title">放大网络类型图标</string>
+    <string name="sb_network_type_size_desc">增大自定义图标包的网络类型指示器大小</string>
+    <string name="hint_icon_size_increase">图标看起来太小？轻触此处调整图标大小</string>
     <string name="section_title_color">颜色</string>
-    <string name="sb_color_tint_title">色调</string>
+    <string name="sb_color_tint_title">状态栏图标颜色</string>
     <string name="sb_color_tint_desc">着色状态栏的图标和文本</string>
     <string name="sb_tint_system">默认系统色调</string>
     <string name="sb_tint_monet">Monet / 强调色色调</string>
@@ -507,6 +536,7 @@
     <string name="lockscreen_device_widget_style_classic">两条圆角</string>
     <string name="lockscreen_device_widget_style_arcs">四条圆角</string>
     <!-- LS Widgets Actions -->
+    <string name="none">无</string>
     <string name="camera">相机</string>
     <string name="clock_timer">时钟/计时器</string>
     <string name="calculator">计算器</string>
@@ -684,8 +714,16 @@
     <string name="volume_percentage_desc">在音量滑块之上显示百分比</string>
     <string name="safety_warning_title">安全警告</string>
     <string name="safety_warning_desc">在高音量时显示警告</string>
+    <string name="app_volume_button_title">单个应用音量</string>
+    <string name="app_volume_button_desc">在音量面板中长按菜单按钮以查看处于活动状态的音频源</string>
+    <string name="multi_audio_focus_title">多个音频源</string>
+    <string name="multi_audio_focus_desc">允许数个应用同时播放音频。需要完全重启设备。</string>
     <string name="colored_ringer_icon_title">彩色铃声图标</string>
     <string name="colored_ringer_icon_desc">如果选中的铃声图标不可见则启用</string>
+    <string name="volume_sheet_app_volume">应用音量</string>
+    <string name="volume_sheet_no_active_source">未找到活动源</string>
+    <string name="volume_sheet_active_sources_count_format">活动源：%d</string>
+    <string name="volume_sheet_play_music_or_video">请播放一些音乐或视频，然后再次打开此面板。</string>
     <!-- Xposed Header Image -->
     <string name="header_image_title">选择标头图片</string>
     <string name="header_image_desc">在快速设置面板上添加标头图片\n不要从最近文件中选择文件</string>
@@ -697,6 +735,8 @@
     <string name="header_image_zoom_to_fit_desc">默认情况下，图片会被拉伸至合适的尺寸</string>
     <string name="header_image_hide_in_landscape_title">在横屏中隐藏</string>
     <string name="header_image_hide_in_landscape_desc">在横屏模式中隐藏图像</string>
+    <string name="header_image_half_width_in_landscape_title">横屏时半宽</string>
+    <string name="header_image_half_width_in_landscape_desc">在横屏模式下将图像宽度设置为屏幕的一半</string>
     <string name="header_image_alpha_gradient_title">透明梯度</string>
     <string name="header_image_alpha_gradient_desc">给标头图像添加淡入淡出效果</string>
     <!-- Xposed Header Clock -->
@@ -710,6 +750,7 @@
     <string name="header_clock_color_picker_title">时钟颜色选取</string>
     <string name="header_clock_color_picker_desc">设置标头时钟文本的颜色</string>
     <string name="header_clock_expansion_y_title">扩展量</string>
+    <string name="header_clock_landscape_offset_y_title">横屏时 Y 轴偏移</string>
     <string name="header_clock_font_text_scaling_title">文本缩放</string>
     <string name="header_clock_side_margin_title">侧边距</string>
     <string name="header_clock_top_margin_title">上边距</string>
@@ -717,6 +758,8 @@
     <string name="header_clock_white_text_desc">强制文本颜色为白色</string>
     <string name="header_clock_center_clock_title">中央时钟</string>
     <string name="header_clock_center_clock_desc">将时钟移至视图中央</string>
+    <string name="header_clock_half_width_in_landscape_title">横屏时半宽</string>
+    <string name="header_clock_half_width_in_landscape_desc">在横屏模式下将布局宽度设置为屏幕的一半</string>
     <string name="header_clock_hide_landscape_title">在横屏中隐藏</string>
     <string name="header_clock_hide_landscape_desc">在横屏模式中隐藏图像</string>
     <!-- Xposed Lockscreen Clock -->
@@ -729,6 +772,8 @@
     <string name="lockscreen_clock_move_notification_icon_desc">将AOD图标移动到自定义时钟下面，在一些旧的ROM上可能会有问题</string>
     <string name="lockscreen_clock_font_title">时钟字体</string>
     <string name="lockscreen_clock_font_desc">对锁屏时钟使用自定义字体</string>
+    <string name="lockscreen_clock_image1_title">自定义图像 1</string>
+    <string name="lockscreen_clock_image2_title">自定义图像 2</string>
     <string name="lockscreen_clock_image_title">锁屏时钟自定义图像</string>
     <string name="lockscreen_clock_image_desc">为锁屏时钟使用自定义图像</string>
     <string name="lsclock_custom_color_title">自定义时钟颜色</string>
@@ -782,6 +827,7 @@
     <string name="wallpaper_background_sensitivity_title">前景灵敏度</string>
     <string name="depth_wallpaper_model_ready">AI 模型已下载到设备上</string>
     <string name="depth_wallpaper_model_not_available">AI模型在设备上不可用 (暂时)</string>
+    <string name="depth_wallpaper_model_checking">正在检查可用的 AI 模型…</string>
     <string name="depth_wallpaper_subject_extraction_started">正在提取壁纸主题…</string>
     <string name="depth_wallpaper_subject_extraction_success">已提取壁纸主题！</string>
     <string name="depth_wallpaper_subject_extraction_failed">提取壁纸主题失败！</string>
@@ -796,10 +842,14 @@
     <string name="statusbar_clock_clickable_title">点击时钟</string>
     <string name="statusbar_clock_clickable_desc">点击时钟打开时钟应用程序</string>
     <string name="section_title_text">文本</string>
-    <string name="statusbar_clock_text_title">时钟文本颜色</string>
-    <string name="sbclock_color_follow_system">跟随系统</string>
-    <string name="sbclock_color_transparent_text">透明文本</string>
-    <string name="sbclock_color_custom_color">自定义颜色</string>
+    <string name="statusbar_clock_text_color_title">时钟文本颜色</string>
+    <string name="sbclock_text_color_follow_system">跟随系统</string>
+    <string name="sbclock_text_color_transparent_text">透明文本</string>
+    <string name="sbclock_text_color_custom_color">自定义颜色</string>
+    <string name="statusbar_clock_fill_color_title">时钟填充颜色</string>
+    <string name="sbclock_fill_color_accent">应用 Monet 强调色</string>
+    <string name="sbclock_fill_color_gradient">应用 Monet 渐变色</string>
+    <string name="sbclock_fill_color_custom">时钟自定义文本颜色</string>
     <string name="clock_text_color_picker_title">文本颜色选择器</string>
     <string name="clock_text_color_picker_desc">设置状态栏时钟文本的颜色</string>
     <string name="section_title_status_icons">状态图标</string>
@@ -818,8 +868,10 @@
     <string name="fill_end_color">填充末尾颜色</string>
     <string name="section_title_border">边框</string>
     <string name="enable_border">启用边框</string>
-    <string name="accent_border_color">突出边框颜色</string>
-    <string name="border_color">边框颜色</string>
+    <string name="border_color_title">边框颜色</string>
+    <string name="border_color_accent">强调颜色</string>
+    <string name="border_color_custom">自定义颜色</string>
+    <string name="border_color_custom_title">自定义边框颜色</string>
     <string name="dashed_border">虚线边框</string>
     <string name="dash_width">虚线宽度</string>
     <string name="dash_gap">虚线间距</string>
@@ -904,6 +956,8 @@
     <string name="status_bar_logo_style_custom">自定义图片</string>
     <string name="status_bar_logo_tint_title">跟随状态栏色调</string>
     <string name="status_bar_logo_tint_desc">切换到浅色/深色背景以更新色调</string>
+    <string name="status_bar_logo_chooser_title">选择图标</string>
+    <string name="status_bar_logo_chooser_desc">选择一个自定义图标</string>
     <!-- Xposed Dual Statusbar -->
     <string name="dsb_title">双列状态栏</string>
     <string name="dsb_portrait_only_title">仅图标</string>
@@ -937,13 +991,33 @@
     <string name="ls_wallpaper_blur_title">壁纸模糊</string>
     <string name="ls_wallpaper_blur_desc">在锁屏界面应用模糊效果</string>
     <string name="ls_wallpaper_blur_radius_title">壁纸模糊强度</string>
+    <string name="activity_title_lockscreen_visualizer">音乐可视化工具</string>
+    <string name="activity_desc_lockscreen_visualizer">在锁定屏幕上显示音乐视觉效果</string>
+    <string name="lockscreen_visualizer_color_mode_title">色彩模式</string>
+    <string name="lockscreen_visualizer_static_color_title">颜色</string>
+    <string name="lockscreen_visualizer_gradient_start_title">起始颜色</string>
+    <string name="lockscreen_visualizer_gradient_end_title">结束颜色</string>
+    <string name="lockscreen_visualizer_lava_speed_title">流速</string>
+    <string name="lockscreen_visualizer_sensitivity_title">灵敏度</string>
+    <string name="lockscreen_visualizer_height_title">可视化工具高度</string>
+    <string name="lockscreen_visualizer_bar_thickness_title">条形厚度</string>
+    <string name="lockscreen_visualizer_smoothness_title">平滑度</string>
+    <string name="lockscreen_visualizer_fps_title">可视化工具帧率</string>
     <!-- Changelog -->
     <string name="activity_title_changelog">更新日志</string>
     <string name="no_internet_connection">无法连接至服务器！\n这可能与您的互联网连接有关，或者此刻服务器可能已经宕机。请稍后再试。</string>
     <string name="changelog_not_found">未找到更新日志！\n这可能与您的互联网连接有关，或者此刻服务器可能已经宕机。请稍后再试。</string>
     <string name="individual_changelog_not_found">出了点问题。\n这个更新日志可能在服务器上不可用。</string>
+    <string name="changelog_changes_in">%1$s 中的变更</string>
+    <string name="changelog_changes_since">自 %1$s 以来的变更</string>
     <!-- App Updates -->
+    <string name="settings_section_title_updates">更新</string>
+    <string name="settings_app_update_checker_title">应用更新</string>
+    <string name="check_for_updates_button">检查更新</string>
+    <string name="download_update_button">下载更新</string>
     <string name="checking_for_update">检查更新</string>
+    <string name="downloading_update">正在下载更新\n(%d%%)</string>
+    <string name="installing_update">正在提示安装…</string>
     <string name="update_available">新的更新可用！</string>
     <string name="update_dialog_desc">更新 %s 可供下载。</string>
     <string name="view_changelog">查看更新日志</string>
@@ -1053,6 +1127,8 @@
     <string name="btn_disable_custom_colors">禁用自定义颜色</string>
     <string name="btn_enable_custom_colors">应用颜色</string>
     <string name="btn_reset">重置</string>
+    <string name="btn_decrease">减少</string>
+    <string name="btn_increase">增加</string>
     <string name="btn_reboot_now">立即重启</string>
     <string name="btn_download">下载</string>
     <string name="btn_restart_systemui">重启 SystemUI</string>
@@ -1062,6 +1138,7 @@
     <string name="btn_skip">跳过</string>
     <string name="btn_next">下一页</string>
     <string name="btn_back">返回</string>
+    <string name="btn_agree">我同意</string>
     <string name="btn_lets_go">来吧</string>
     <string name="btn_close">禁用</string>
     <string name="btn_positive">是的</string>
@@ -1097,6 +1174,8 @@
     <string name="toast_selected_successfully">选择成功</string>
     <string name="toast_unavailable">不可用</string>
     <string name="toast_use_from_xposed_menu">使用 Xposed 菜单中的此功能</string>
+    <string name="toast_downgrade_kernelsu">请降级 KernelSU 后再试</string>
+    <string name="toast_reboot_and_try_again">请重启设备后再试</string>
     <!-- Push Notification -->
     <string name="new_update_title">更新可用</string>
     <string name="new_update_desc">Iconify 的新版本已经推出。</string>
@@ -1161,6 +1240,7 @@
     <string name="force_enable_blur_desc">为不支持的系统强制启用模糊</string>
     <string name="choose_header_image">选择标头图片</string>
     <string name="choose_clock_font">选择时钟字体</string>
+    <string name="choose_weather_font">选择天气信息字体</string>
     <string name="pick_style">选择一种你喜欢的样式</string>
     <string name="attention">注意！</string>
     <string name="method_toggle_dark_mode">双重切换深色模式</string>
@@ -1200,6 +1280,7 @@
     <string name="learn_more">了解更多</string>
     <string name="custom_tiles_footer_info">为确保自定义磁贴正常工作，在使用自定义磁贴之前，请先使用一次默认的互联网和蓝牙磁贴。</string>
     <string name="hig_res_image_footer_info">尽量避免使用高分辨率的图片，因为这可能会导致您的SystemUI崩溃。</string>
+    <string name="qs_grid_footer_info">切换两次深色模式或重启SystemUI以应用更改。</string>
     <string name="more">更多</string>
     <!-- Weather -->
     <!-- Omni Jaws Strings -->
@@ -1215,8 +1296,6 @@
     <string name="settings_title">设置</string>
     <string name="auto_update_title">自动更新</string>
     <string name="auto_update_summary">每隔一段时间检查新版本</string>
-    <string name="update_over_wifi_title">仅通过 WiFi 检查更新</string>
-    <string name="update_over_wifi_summary">仅当连接到 wifi 时才检查后台更新</string>
     <string name="unit_metric">公制 (\u00b0C)</string>
     <string name="unit_imperial">英制 - (\u00b0F)</string>
     <string name="update">更新</string>
@@ -1359,4 +1438,72 @@
     <string name="switch_theme_required_desc">发生意外行为时在亮色和暗色主题间切换。</string>
     <string name="device_rotation_required_title">设备旋转主题</string>
     <string name="device_rotation_required_desc">切换您设备的旋转以使此更改生效。</string>
+    <string name="hex_color">颜色Hex</string>
+    <string name="hex_color_prefix">#</string>
+    <string name="enter_6_or_8_hex_digits">输入 6位 (RRGGBB) 或 8 位(AARRGGBB) 十六进制数字</string>
+    <string name="btn_pick_video">选择视频</string>
+    <string name="btn_pick_audio">选择音频</string>
+    <string name="btn_pick_pdf">选择PDF</string>
+    <string name="btn_pick_document">选择文档</string>
+    <string name="btn_pick_file">选择文件</string>
+    <string name="btn_replace_file">替换</string>
+    <string name="file_unknown_name">未知文件</string>
+    <string name="file_clear">清除</string>
+    <string name="advanced_color_settings_title">高级设置</string>
+    <string name="advanced_color_settings_desc">使用高级自定义色彩</string>
+    <string name="look_and_feel_title">Look &amp; Feel</string>
+    <string name="look_and_feel_desc">主题、对比度及颜色</string>
+    <string name="ok">好的</string>
+    <string name="no_key_provided">No key provided</string>
+    <string name="hide_default_battery_desc">隐藏状态栏中默认的电池图标</string>
+    <string name="requires_link_to_custom_color">Requires ‘Link to Custom Color’ to be enabled in Xposed &gt; Statusbar</string>
+    <string name="choose_custom_color">选择自定义颜色</string>
+    <string name="statusbar_switch_between_light_and_dark">Switch between light and dark themes to update the status bar color.</string>
+    <string name="theme_color">主题颜色</string>
+    <string name="theme_color_dynamic">动态</string>
+    <string name="palette_style">Palette Style</string>
+    <string name="amoled_mode_title">Amoled 模式</string>
+    <string name="amoled_mode_desc">在深色模式下使用纯黑色背景</string>
+    <string name="expressive_colors_title">Expressive Colors</string>
+    <string name="expressive_colors_desc">Use colors that are more chromatic</string>
+    <string name="contrast_level">Contrast Level</string>
+    <string name="contrast_default">默认</string>
+    <string name="contrast_medium">中</string>
+    <string name="contrast_high">高</string>
+    <string name="contrast_reduced">Reduced</string>
+    <string name="animations_title">动画</string>
+    <string name="animations_desc">Enable fluid animations, screen transitions and touch feedback effects</string>
+    <string name="blur_effect_title">模糊效果</string>
+    <string name="blur_effect_desc">Apply a blur effect to backgrounds and UI elements</string>
+    <string name="floating_bottom_bar_title">Floating Bottom Bar</string>
+    <string name="floating_bottom_bar_desc">Make the bottom bar float over content</string>
+    <string name="display_scale_title">Display Scale</string>
+    <string name="display_scale_desc">Change the size of UI elements</string>
+    <string name="text_scale_title">Text Scale</string>
+    <string name="text_scale_desc">Change the size of text</string>
+    <string name="header_image_maximum_height_title">Maximum Height</string>
+    <string name="header_image_maximum_height_desc">Show header image on full QS panel</string>
+    <string name="fix_notification_expand_button_color_title">Fix Notification Expand Button Color</string>
+    <string name="fix_notification_expand_button_color_desc">Fix expand button background color on Android 16 QPR3 beta</string>
+    <string name="quick_settings_theme">Quick Settings Theme</string>
+    <string name="tile_background_color">Tile Background Color</string>
+    <string name="icon_color">图标颜色</string>
+    <string name="icon_background_color">Icon Background Color</string>
+    <string name="label_color">Label Color</string>
+    <string name="secondary_label_color">Secondary Label Color</string>
+    <string name="dsb_portrait_only_desc">Display dual rows in portrait mode only</string>
+    <string name="link_to_custom_color_title">Link to Custom Color</string>
+    <string name="link_to_custom_color_desc">Use the color selected in Home screen &gt; More &gt; Statusbar</string>
+    <string name="buy_a_coffee">买一杯咖啡</string>
+    <string name="developer_intro_desc">打造精美的 Android 定制体验。如果 Iconify 给您带来快乐，一杯咖啡就足够了！☕</string>
+    <string name="lead_developer">首席开发者</string>
+    <string name="pick_a_color">Pick a color</string>
+    <string name="section_title_appearance">外观</string>
+    <string name="section_title_additional_settings">其他设置</string>
+    <string name="section_title_active_tile_colors">Active Tile Colors</string>
+    <string name="section_title_inactive_tile_colors">Inactive Tile Colors</string>
+    <string name="section_title_disabled_tile_colors">Disabled Tile Colors</string>
+    <!-- Search -->
+    <string name="search_settings_hint">搜索设置…</string>
+    <string name="search_no_results">未找到结果</string>
 </resources>
